@@ -87,6 +87,40 @@ def query_all_text_messages_from_contact(phone_number: str):
     return msg_list
 
 
+def query_text_messages_from_contact(phone_number: str, query: str):
+    if phone_number not in messages:
+        return "Could not find any messages with this phone number"
+
+    contact_list = get_contact_from_phone_number(phone_number)
+
+    assert len(contact_list) > 0
+    contact = contact_list[0]
+    contact_name = f"{contact.first_name} {contact.last_name}"
+
+    indices = set()
+
+    msg_list = messages[phone_number].messages
+    # filter messages with the relevant query
+    for i in range(len(msg_list)):
+        if query.lower() in msg_list[i].text.lower():
+            # grab 7 around each relevant
+            lower = max(0, i - 7)
+            upper = min(i + 7 + 1, len(msg_list))
+            indices.update(list(range(lower, upper)))
+
+    # grab those messages
+    print(indices)
+    msg_str = ""
+    for idx in indices:
+        msg = messages[phone_number].messages[idx]
+        date_str = format_datetime(msg.date)
+        person = contact_name if msg.sender == phone_number else msg.sender
+
+        msg_str += f"{person} - {date_str}: {msg.text}\n"
+
+    return msg_str
+
+
 # def query)al
 
 
@@ -104,10 +138,10 @@ def main():
     # result = query_contacts_by_name("Tony")
     # print(result)
     # print("\n" * 10)
-    # result = query_all_text_messages_from_contact("+16505189339")
-    # print(result)
+    result = query_text_messages_from_contact("+16505189339", "birthday")
+    print(result)
 
-    chat_instance = chat.Chat()
+    """ chat_instance = chat.Chat()
 
     r = chat_instance.chat("When is Tony's birthday?")
 
@@ -126,7 +160,8 @@ def main():
             print("am confused", r)
             break
 
-    print(r)
+    print(r) """
+
     # output = call_func(r)
     # print(output)
     # r = chat_instance.chat(output)
