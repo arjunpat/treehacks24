@@ -23,6 +23,12 @@ ex: To answer "What is Stephan's address?" -> query_contacts_by_name("Stephan")
 
 If there are duplicate contacts, reply "RESPONSE TO USER: There are a few contacts matching Stephan. Which one would you like: {list contacts with numbers}"
 
+You can query messages that include certain words by using the following query:
+
+query_text_messages_from_contact(phone_number: str, query: str)
+
+This query will return all messages from this contact with the query string plus the 7 messages before and after the matches messages.
+
 
 For more complex queries that require contextual information, you can query the entire chat history with another user by using the following query:
 
@@ -31,14 +37,6 @@ query_all_text_messages_from_contact(phone_number: str) To answer "What would be
 This would be good for scenarios such as asking what gift someone would appreciate. 
 
 To answer user queries, please think in a step-by-step manner and use ONE query at a time. Please spell out all reasoning for calling an api, and include the call to the API as the FINAL text in your response. We will then execute the API and return the result. You can use the result to get more information. When you are ready to respond to the user, start your reponse with "RESPONSE TO USER:" and we will display the output to the user you are trying to help. Be as helpful as possible and as logical as possible. If you are unsure, ask for more information or try to query using other APIs."""
-
-PROMPT_REMOVED = """
-You can query messages that include certain words by using the following query:
-
-query_text_messages_from_contact(phone_number: str, query: str)
-
-This query will return all messages from this contact with the query string plus the 10 messages before and after the matches messages.
-"""
 
 
 class Chat:
@@ -55,8 +53,8 @@ class Chat:
             "Authorization": f"Bearer {OPENAI_API_KEY}",
         }
         data = {
-            # "model": "gpt-3.5-turbo",
-            "model": "gpt-4-turbo-preview",
+            "model": "gpt-3.5-turbo",
+            # "model": "gpt-4-turbo-preview",
             # "messages": [
             #     {"role": "system", "content": PROMPT},
             #     {"role": "user", "content": query},
@@ -64,8 +62,12 @@ class Chat:
             "messages": messages,
             "temperature": 0,
         }
-        resp = requests.post(OPENAI_URL, headers=headers, json=data).json()
-        completion = resp["choices"][0]["message"]["content"]
+        resp = requests.post(OPENAI_URL, headers=headers, json=data)
+        if resp.status_code == "200":
+            completion = resp.json()["choices"][0]["message"]["content"]
+        else:
+            print("Error in OpenAI request")
+            completion = "(error)"
 
         self.history.append({"role": "assistant", "content": completion})
         return completion
