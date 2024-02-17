@@ -22,5 +22,6 @@ def call_func(response: str):
             fake_query(params.strip('"'))
 
 
-r = chat.chat("What is Stephan's phone number?")
-call_func(r)
+chatter = chat.Chat()
+res = chatter.chat("What is Stephan's phone number?")
+print(res)

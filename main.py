@@ -87,14 +87,17 @@ def query_all_text_messages_from_contact(phone_number: str):
     return msg_list
 
 
+# def query)al
+
+
 def call_func(response: str):
     parser = re.compile(r"(query.*)\((.*)\)")
     if m := parser.match(response.splitlines()[-1]):
         # super secure 😎
-        output = eval(m.group(0))
-        print(output)
+        code = m.group(0)
+        return code, eval(m.group(0))
     else:
-        print(f"Error - unrecognized response:\n{response}")
+        return None, False
 
 
 def main():
@@ -103,9 +106,37 @@ def main():
     # print("\n" * 10)
     # result = query_all_text_messages_from_contact("+16505189339")
     # print(result)
-    r = chat.chat("When is Tony's birthday?")
+
+    chat_instance = chat.Chat()
+
+    r = chat_instance.chat("When is Tony's birthday?")
+
+    while True:
+        if "RESPONSE TO USER:" in r:
+            print(r)
+            break
+        code, output = call_func(r)
+        if output:
+            print(r)
+            print(output)
+            r = chat_instance.chat(
+                f"Here is the output of calling the following api function {code}:\n\n\n\n{output}"
+            )
+        else:
+            print("am confused", r)
+            break
+
     print(r)
-    call_func(r)
+    # output = call_func(r)
+    # print(output)
+    # r = chat_instance.chat(output)
+    # output = call_func(r)
+    # print(r)
+    # r = chat_instance.chat(output)
+    # print(r)
+
+    # print("ENTIRE HISTORY")
+    # print(chat_instance.history)
 
 
 if __name__ == "__main__":
