@@ -121,32 +121,37 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     return msg_str
 
 
-# def query)al
-
-
 def call_func(response: str):
-    parser = re.compile(r"(query.*)\((.*)\)")
-    if m := parser.match(response.splitlines()[-1]):
-        # super secure 😎
-        code = m.group(0)
-        return code, eval(m.group(0))
+    # parser = re.compile(r"^((?:query).*|(?:save).*|(?:retrieve).*)\((.*)\)")
+    # if m := parser.match(response.splitlines()[-1]):
+    parts = response.split("\n\n")
+    for part in parts:
+        lines = [l.strip() for l in part.strip().splitlines()]
+        results = []
+        if "API_CALLS" in lines[0]:
+            for code in lines[1:]:
+                # super secure 😎
+                try:
+                    results.append(eval(code))
+                except:
+                    results.append("(error)")
+            return lines[1:], results
     else:
         return None, False
-
 
 def main():
     # result = query_contacts_by_name("Tony")
     # print(result)
     # print("\n" * 10)
-    result = query_text_messages_from_contact("+16505189339", "birthday")
-    print(result)
+    # result = query_text_messages_from_contact("+16505189339", "birthday")
+    # print(result)
 
-    """ chat_instance = chat.Chat()
+    chat_instance = chat.Chat()
 
     r = chat_instance.chat("When is Tony's birthday?")
 
     while True:
-        if "RESPONSE TO USER:" in r:
+        if "USER_OUTPUT:" in r:
             print(r)
             break
         code, output = call_func(r)
@@ -159,8 +164,6 @@ def main():
         else:
             print("am confused", r)
             break
-
-    print(r) """
 
     # output = call_func(r)
     # print(output)
