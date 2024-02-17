@@ -1,7 +1,7 @@
 import os
 
-import requests
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv(override=True)
 
@@ -41,6 +41,7 @@ To answer user queries, please think in a step-by-step manner and use ONE query 
 
 class Chat:
     def __init__(self):
+        self.client = OpenAI()
         self.history = [{"role": "system", "content": PROMPT}]
 
     def chat(self, query: str):
@@ -48,26 +49,13 @@ class Chat:
         return self._send_chat(self.history)
 
     def _send_chat(self, messages):
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-        }
-        data = {
-            "model": "gpt-3.5-turbo",
-            # "model": "gpt-4-turbo-preview",
-            # "messages": [
-            #     {"role": "system", "content": PROMPT},
-            #     {"role": "user", "content": query},
-            # ],
-            "messages": messages,
-            "temperature": 0,
-        }
-        resp = requests.post(OPENAI_URL, headers=headers, json=data)
-        if resp.status_code == "200":
-            completion = resp.json()["choices"][0]["message"]["content"]
-        else:
-            print("Error in OpenAI request")
-            completion = "(error)"
+        completion = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            # model="gpt-4-turbo-preview",
+            messages=self.history,
+            temperature=0
+        )
+        message = completion.choices[0].message.content
 
-        self.history.append({"role": "assistant", "content": completion})
-        return completion
+        self.history.append({"role": "assistant", "content": message})
+        return message
