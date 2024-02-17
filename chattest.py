@@ -1,4 +1,4 @@
-# import re
+import re
 from typing import Any
 import chat
 
@@ -45,19 +45,23 @@ def retrieve_persona_notepad(phone_number: str) -> str:
     return "Persona {}"
 
 def call_func(response: str):
-    # parser = re.compile(r"^((?:query).*|(?:save).*|(?:retrieve).*)\((.*)\)")
+    code_parser = re.compile(r"((?:query).*|(?:save).*|(?:retrieve).*)\(.*\)", re.MULTILINE)
     # if m := parser.match(response.splitlines()[-1]):
     parts = response.split("\n\n")
     for part in parts:
         lines = [l.strip() for l in part.strip().splitlines()]
         results = []
         if "API_CALLS" in lines[0]:
-            for code in lines[1:]:
-                # super secure 😎
-                try:
-                    results.append(eval(code))
-                except:
-                    results.append("(error)")
+            for line in lines[1:]:
+                if code_match := code_parser.search(line):
+                    code = code_match.group(0)
+                    # super secure 😎
+                    try:
+                        results.append(eval(code))
+                    except:
+                        results.append("(error)")
+                else:
+                    results.append("(error: api not recognized)")
             return lines[1:], results
     else:
         return None, False
