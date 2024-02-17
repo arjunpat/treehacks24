@@ -66,21 +66,24 @@ def call_func(response: str):
     else:
         return None, False
 
+def main(q):
+    chat_instance = chat.Chat()
+    r = chat_instance.chat(q)
 
-chat_instance = chat.Chat()
-r = chat_instance.chat("When is Tony's birthday?")
+    while True:
+        if "USER_OUTPUT:" in r:
+            print(r)
+            break
+        code, output = call_func(r)
+        if output:
+            print(r)
+            print(output)
+            r = chat_instance.chat(
+                f"Here is the output of calling the following api function {code}:\n\n\n\n{output}"
+            )
+        else:
+            print("am confused", r)
+            break
 
-while True:
-    if "USER_OUTPUT:" in r:
-        print(r)
-        break
-    code, output = call_func(r)
-    if output:
-        print(r)
-        print(output)
-        r = chat_instance.chat(
-            f"Here is the output of calling the following api function {code}:\n\n\n\n{output}"
-        )
-    else:
-        print("am confused", r)
-        break
+if __name__ == "__main__":
+    main("When is Tony's birthday?")
