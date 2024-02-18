@@ -161,7 +161,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     # grab those messages
     # print(indices)
     msg_str = ""
-    msg_str_list: list[tuple[int, list[tuple[bool, str]]]] = []
+    msg_str_list: list[tuple[int, Message]] = []
     for idx in indices:
         msg = messages[phone_number].messages[idx]
         date_str = format_datetime(msg.date)
@@ -169,13 +169,14 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
 
-        lower = max(0, idx - CONTEXT_LEN)
-        upper = min(idx + CONTEXT_LEN + 1, len(msg_list))
-        msgs = []
-        for i in range(lower, upper):
-            m = messages[phone_number].messages[i]
-            msgs.append((m.sender == phone_number, m))
-        msg_str_list.append((idx, msgs))
+        msg_str_list.append((idx, msg, msg.sender == phone_number))
+        # lower = max(0, idx - CONTEXT_LEN)
+        # upper = min(idx + CONTEXT_LEN + 1, len(msg_list))
+        # msgs = []
+        # for i in range(lower, upper):
+        #     m = messages[phone_number].messages[i]
+        #     msgs.append((m.sender == phone_number, m))
+        # msg_str_list.append((idx, msgs))
     # msg_str_list is [(citationId, [(bool, text)])]
 
     return msg_str, msg_str_list
@@ -296,24 +297,16 @@ async def main(query="When is Tony Xin's birthday?", notify_callback=None):
 
                 get_cits = set()
                 for num_str in cits:
-                    citation_id = int(num_str)
-                    get_cits.update((citation_id - 1, citation_id, citation_id + 1))
+                    c = int(num_str)
+                    get_cits.update((c - 1, c, c + 1))
 
-                final_cits = []
-                for citation_id, messages in text_msgs_citations:
-                    if citation_id in get_cits:
-                        final_cits.append(
-                            {
-                                "citationId": citation_id,
-                                "messages": [
-                                    {
-                                        "speaker": "other" if message[0] else "self",
-                                        "text": message[1].text,
-                                    }
-                                    for message in messages
-                                ],
-                            }
-                        )
+                final_cits = {}
+                for c, m, isOther in text_msgs_citations:
+                    if c in get_cits:
+                        final_cits[c] = {
+                            "speaker": "other" if isOther else "self",
+                            "text": m.text,
+                        }
 
                 print(final_cits)
 
