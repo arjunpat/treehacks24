@@ -2,7 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import skiingImage1 from '../../assets/dynamic-images/skiing1.jpeg';
 	import skiingImage2 from '../../assets/dynamic-images/skiing2.jpg';
-	import skiingImage3 from '../../assets/dynamic-images/skiing2.jpg';
+	import skiingImage3 from '../../assets/dynamic-images/skiing3.jpg';
 
 	export let text: string;
 	let question_image = {
