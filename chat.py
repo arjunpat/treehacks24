@@ -58,7 +58,7 @@ API_CALLS:
 List the API calls, one per line. Must be valid Python syntax. For most queries, you will first need to query_contacts_by_name to get the users phone number. Feel free to query_text_messages_from_contact with multiple query words that may be relevant, all in one go. YOU ONLY HAVE ACCESS TO THESE API CALLS.
 
 USER_OUTPUT:
-OUTPUT n/a IF YOU DO NOT YET KNOW THE ANSWER. If you give up, please also state that here. It may take a few rounds of back and forth with APIs in order to accumulate the information needed for a response. In USER_OUTPUT, please cite the relevant text message used to get that result using [text_msg_idx] after the message. If there is any ambiguity, please give a well written response explaining it and possible answers.
+OUTPUT n/a IF YOU DO NOT YET KNOW THE ANSWER. If you give up, please also state that here. It may take a few rounds of back and forth with APIs in order to accumulate the information needed for a response. In USER_OUTPUT, please cite the relevant text message used to get that result using [text_msg_idx] after the message. If there is any ambiguity, please give a well written response explaining it and possible answers. Limit citations to 1-3 per response. 
 """
 
 
