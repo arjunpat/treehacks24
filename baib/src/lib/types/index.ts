@@ -12,8 +12,7 @@ export type TextContent = {
 };
 
 export type MessageContent = {
-	citationId: string;
-	messages: Message[];
+	[id: string]: Message;
 };
 
 export type Message = {

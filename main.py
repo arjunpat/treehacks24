@@ -131,7 +131,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     contact_name = f"{contact.first_name} {contact.last_name}"
 
     indices = set()
-    CONTEXT_LEN = 7
+    CONTEXT_LEN = 4
 
     if "code" in query:
         return """
@@ -164,12 +164,13 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     msg_str_list: list[tuple[int, Message]] = []
     for idx in indices:
         msg = messages[phone_number].messages[idx]
-        date_str = format_datetime(msg.date)
-        person = contact_name if msg.sender == phone_number else msg.sender
+        if len(msg.text) > 5 and len(msg.text) < 125:
+            date_str = format_datetime(msg.date)
+            person = contact_name if msg.sender == phone_number else msg.sender
 
-        msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
+            msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
 
-        msg_str_list.append((idx, msg, msg.sender == phone_number))
+            msg_str_list.append((idx, msg, msg.sender == phone_number))
         # lower = max(0, idx - CONTEXT_LEN)
         # upper = min(idx + CONTEXT_LEN + 1, len(msg_list))
         # msgs = []
@@ -268,6 +269,7 @@ It's important to note that the absence of clear evidence for a second individua
 
 async def main(query="When is Tony Xin's birthday?", notify_callback=None):
     # query = "When was my last skiing trip with Amira and what did we do?"
+    # query = "What are Tony's love interests? List two."
     # query = "What is Akash's birthday?"
     if query.strip() == "":
         return ""
