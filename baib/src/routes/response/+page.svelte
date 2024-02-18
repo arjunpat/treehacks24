@@ -6,6 +6,8 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
+	const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
+
 	let question = "What is Tony's birthday?";
 	let answer: AnswerContent[] = [
 		{
@@ -58,12 +60,15 @@
 	let messageProgress: Progress = { done: false, text: '' };
 
 	onMount(() => {
-		let socket = new WebSocket('ws://localhost:8000/generate');
+		// console.log();
+		// return;
+		let socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
 		socket.onopen = (event) => {
 			socket.send(JSON.stringify({ question: "When is Clement's birthday?" }));
 		};
 		socket.onmessage = (event) => {
 			const data = JSON.parse(event.data);
+			console.log('message: ', data);
 			if (data.status === 'progress') {
 				const insideQuoteRegex = /"(.+?)"/g;
 				if (data.progress.includes('query_contacts_by_name')) {
