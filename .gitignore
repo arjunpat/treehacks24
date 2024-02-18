@@ -5,7 +5,7 @@ __pycache__/
 static
 # C extensions
 *.so
-
+message_cache.pkl
 # Distribution / packaging
 .Python
 build/

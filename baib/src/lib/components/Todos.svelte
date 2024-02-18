@@ -27,13 +27,17 @@
   let ready = false;
   let new_todos;
 
+  let interval: any;
+
   const retrieveTodos = () => {
 		fetch("https://l6xbzhkc-8000.usw3.devtunnels.ms/actions")
 		.then(response => response.json())
 		.then(data => {
+      console.log($action_items)
       action_items.set(data["action_items"]);
 		}).catch(error => {
 			console.log(error);
+      clearInterval(interval)
 			return [];
 		});
 	}
@@ -41,7 +45,7 @@
 	onMount(() => {
 		ready = true;
 
-    retrieveTodos()
+    setInterval(retrieveTodos, 1000)
 	});
 </script>
 
