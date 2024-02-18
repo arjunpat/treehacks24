@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -255,8 +256,8 @@ It's important to note that the absence of clear evidence for a second individua
 
 
 async def main(query="", notify_callback=None):
-    # query = "Who is Tony Xin romantically interested in. List 2 names and reasons why."
-    query = "What should I get Tony Xin for his birthday"
+    query = "When was my last skiing trip with Amira and what did we do?"
+    # query = "What should I get Tony Xin for his birthday?"
     # query = "What is Akash's birthday?"
     if query.strip() == "":
         return ""
@@ -296,7 +297,7 @@ async def main(query="", notify_callback=None):
 
                 print(final_cits)
 
-                return 0, ff_reponse  # exit with success
+                return 0, ff_reponse, final_cits  # exit with success
                 # else:
                 return 1, final_response  # exit with no success
         code, output = await call_func(r, notify_callback)
@@ -321,4 +322,5 @@ async def main(query="", notify_callback=None):
 
 
 if __name__ == "__main__":
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

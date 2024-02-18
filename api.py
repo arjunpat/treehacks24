@@ -1,14 +1,17 @@
+import copy
+import os
+import random
 from contextlib import asynccontextmanager
 from datetime import datetime
-import copy
-import random
 
 from fastapi import FastAPI, WebSocket
+from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from pydantic import BaseModel
 
 # from chattest import main
 from main import main
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,21 +19,33 @@ async def lifespan(app: FastAPI):
     await poll_action_items()
     yield
 
+
 app = FastAPI(lifespan=lifespan)
 
 actions = []
 
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+app.mount(
+    "/static", StaticFiles(directory=os.path.join(dir_path, "static")), name="static"
+)
+
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 class ActionItem:
     name: str
     brief_description: str
     due_date: datetime
 
+
 class Query(BaseModel):
     question: str
+
 
 @app.post("/query")
 def query(query: Query):
@@ -73,6 +88,7 @@ async def generate(websocket: WebSocket):
     resp = {"status": status, "answer": ans}
     await websocket.send_json(resp)
 
+
 # response with whether there are action items to take
 @app.get("/actions")
 def get_actions():
@@ -80,11 +96,12 @@ def get_actions():
     actions.clear()
     return resp
 
+
 @repeat_every(seconds=10)
 def poll_action_items():
     print("Calling API...")
     # TODO: call gmail API -> action item function here
-    r = random.randint(1,100)
+    r = random.randint(1, 100)
     if r % 5 == 0:
         print("Item recognized!")
         actions.append(r)
