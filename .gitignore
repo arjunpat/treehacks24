@@ -168,6 +168,6 @@ cython_debug/
 
 .env
 
-demo.pycredentials.json
+credentials.json
 token.json
 .DS_Store
