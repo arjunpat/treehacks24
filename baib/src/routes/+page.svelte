@@ -69,41 +69,44 @@
 				/>
 			{/if}
 
-			{#if ready}
-				<div class="mt-10 flex gap-1 w-full" transition:fade>
-					<input class="input rounded-lg" bind:value={input} placeholder="enter your name" />
-					<button type="button" class="btn-icon variant-filled-surface"><ArrowRightIcon /></button>
-				</div>
-			{/if}
-
-			{#if ready}
-				<div class="w-full mt-5" transition:fade>
-					<h1>Searches through</h1>
-					<div class="card p-4 mt-1 flex items-center justify-between">
-						<div class="flex gap-2 items-center">
-							<img class="w-5 h-5" alt="imessage" src={imLogo} />
-							<p>imessage</p>
+			<div class="w-full absolute bottom-0 bg-red-50 p-2">
+				{#if ready}
+					<div class="w-full mt-24" transition:fade>
+						<h1>Searches through</h1>
+						<div class="card p-4 mt-1 flex items-center justify-between">
+							<div class="flex gap-2 items-center">
+								<img class="w-5 h-5" alt="imessage" src={imLogo} />
+								<p>imessage</p>
+							</div>
+							<div><p class="text-gray-500">connected</p></div>
 						</div>
-						<div><p class="text-gray-500">connected</p></div>
-					</div>
 
-					<div class="card p-4 mt-1 flex items-center justify-between">
-						<div class="flex gap-2 items-center">
-							<img class="w-5 h-4" alt="gmail" src={gmailLogo} />
-							<p>gmail</p>
+						<div class="card p-4 mt-1 flex items-center justify-between">
+							<div class="flex gap-2 items-center">
+								<img class="w-5 h-4" alt="gmail" src={gmailLogo} />
+								<p>gmail</p>
+							</div>
+							<div><p class="text-gray-500">connected</p></div>
 						</div>
-						<div><p class="text-gray-500">connected</p></div>
-					</div>
 
-					<div class="card p-4 mt-1 flex items-center justify-between">
-						<div class="flex gap-2 items-center">
-							<img class="w-5 h-5" alt="googlephotos" src={gPhotos} />
-							<p>google photos</p>
+						<div class="card p-4 mt-1 flex items-center justify-between">
+							<div class="flex gap-2 items-center">
+								<img class="w-5 h-5" alt="googlephotos" src={gPhotos} />
+								<p>google photos</p>
+							</div>
+							<div><p class="text-gray-500">connected</p></div>
 						</div>
-						<div><p class="text-gray-500">connected</p></div>
 					</div>
-				</div>
-			{/if}
+				{/if}
+
+				{#if ready}
+					<div class="mt-2 flex gap-1 w-full" transition:fade>
+						<input class="input rounded-lg" bind:value={input} placeholder="ask anything :)" />
+						<button type="button" class="btn-icon variant-filled-surface"><ArrowRightIcon /></button
+						>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 </div>

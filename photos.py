@@ -6,6 +6,8 @@ from googleapiclient.discovery import build
 from PIL import Image
 from io import BytesIO
 import requests
+from datetime import datetime
+
 
 # Google Photos API scope
 SCOPES = ["https://www.googleapis.com/auth/photoslibrary.readonly"]
@@ -39,21 +41,39 @@ def retrieve_photos():
     # Use specific version for Google Photos API
     service = build("photoslibrary", API_VERSION, credentials=creds, static_discovery=False)
     
-    results = (
-        service.mediaItems()
-        .list(pageSize=10)  # You can change the page size
-        .execute()
-    )
-    print(results)
+    start_date = input("Enter start date (YYYY-MM-DD): ")
+    end_date = input("Enter end date (YYYY-MM-DD): ")
+    
+    start_year, start_month, start_day = map(int, start_date.split('-'))
+    end_year, end_month, end_day = map(int, end_date.split('-'))
+    
+    filters = {
+        "dateFilter": {
+            "ranges": [{
+                "startDate": {"year": start_year, "month": start_month, "day": start_day},
+                "endDate": {"year": end_year, "month": end_month, "day": end_day}
+            }]
+        }
+    }
+
+    # Correctly include pageSize in the request body
+    request_body = {
+        "filters": filters,
+        "pageSize": 100  # Adjusted pageSize to retrieve more items
+    }
+
+    # Retrieve media items based on the date range
+    results = service.mediaItems().search(body=request_body).execute()
 
     items = results.get("mediaItems", [])
+    print(items)
 
-    for item in items:
-        base_url = item["baseUrl"]
-        img_data = requests.get(base_url).content
+    # for item in items:
+    #     base_url = item["baseUrl"]
+    #     img_data = requests.get(f"{base_url}=d").content
 
-        image = Image.open(BytesIO(img_data))
-        image.show()
+    #     image = Image.open(BytesIO(img_data))
+    #     image.show()
 
 if __name__ == "__main__":
     retrieve_photos()
