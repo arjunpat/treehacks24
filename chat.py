@@ -39,6 +39,8 @@ This would be good for scenarios such as asking what gift someone would apprecia
 To answer user queries, please think in a step-by-step manner and use ONE query at a time. Please spell out all reasoning for calling an api, and include the call to the API as the FINAL text in your response. We will then execute the API and return the result. You can use the result to get more information. When you are ready to respond to the user, start your reponse with "RESPONSE TO USER:" and we will display the output to the user you are trying to help. Be as helpful as possible and as logical as possible. If you are unsure, ask for more information or try to query using other APIs."""
 
 REMOVED = """
+save_to_persona_notepad(phone_number: str, info: str) -> None
+retrieve_persona_notepad(phone_number: str) -> str
 """
 
 PRMOPT_2 = """
@@ -48,8 +50,7 @@ You will have access to all of their text messages and their contacts.
 
 query_contacts_by_name(name: str) -> list[Contact]
 query_text_messages_from_contact(phone_number: str, query: str) -> list[Message]
-save_to_persona_notepad(phone_number: str, info: str) -> None
-retrieve_persona_notepad(phone_number: str) -> str
+
 
 Please format your response as follows.
 
