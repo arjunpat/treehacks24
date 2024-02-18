@@ -131,6 +131,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     contact_name = f"{contact.first_name} {contact.last_name}"
 
     indices = set()
+    CONTEXT_LEN = 7
 
     if "code" in query:
         return """
@@ -153,8 +154,8 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         for j in range(len(query)):
             if query[j].lower() in msg_list[i].text.lower():
                 # grab 7 around each relevant
-                lower = max(0, i - 7)
-                upper = min(i + 7 + 1, len(msg_list))
+                lower = max(0, i - CONTEXT_LEN)
+                upper = min(i + CONTEXT_LEN + 1, len(msg_list))
                 indices.update(list(range(lower, upper)))
 
     # grab those messages
@@ -167,7 +168,16 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         person = contact_name if msg.sender == phone_number else msg.sender
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
+
         msg_str_list.append((idx, msg, msg.sender == phone_number))
+        # lower = max(0, idx - CONTEXT_LEN)
+        # upper = min(idx + CONTEXT_LEN + 1, len(msg_list))
+        # msgs = []
+        # for i in range(lower, upper):
+        #     m = messages[phone_number].messages[i]
+        #     msgs.append((m.sender == phone_number, m))
+        # msg_str_list.append((idx, msgs))
+    # msg_str_list is [(citationId, [(bool, text)])]
 
     return msg_str, msg_str_list
     if False:
@@ -256,9 +266,8 @@ It's important to note that the absence of clear evidence for a second individua
 # print(numbers_v4, standardized_response_v4)
 
 
-async def main(query="", notify_callback=None):
+async def main(query="When is Tony Xin's birthday?", notify_callback=None):
     # query = "When was my last skiing trip with Amira and what did we do?"
-    query = "When is Tony Xin's birthday?"
     # query = "What is Akash's birthday?"
     if query.strip() == "":
         return ""
@@ -291,20 +300,13 @@ async def main(query="", notify_callback=None):
                     c = int(num_str)
                     get_cits.update((c - 1, c, c + 1))
 
-                final_cits = []
+                final_cits = {}
                 for c, m, isOther in text_msgs_citations:
                     if c in get_cits:
-                        final_cits.append(
-                            {
-                                "citationId": c,
-                                "messages": [
-                                    {
-                                        "speaker": "other" if isOther else "me",
-                                        "text": m.text,
-                                    }
-                                ],
-                            }
-                        )
+                        final_cits[c] = {
+                            "speaker": "other" if isOther else "self",
+                            "text": m.text,
+                        }
 
                 print(final_cits)
 

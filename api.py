@@ -2,10 +2,12 @@ import copy
 import json
 import os
 import random
+import threading
 from contextlib import asynccontextmanager
 from datetime import datetime
 
 from fastapi import FastAPI, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from pydantic import BaseModel
@@ -22,9 +24,22 @@ from photos_gmail import Email, email_loop
 #     print("Polling for action items...")
 #     await poll_action_items()
 #     yield
-
+allowed_origins = [
+    "http://localhost:3000",  # Allow frontend running on localhost:3000
+    "https://example.com",  # Allow a specific domain
+    # Add any other origins as needed
+    "*",
+]
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,  # List of allowed origins
+    allow_credentials=True,  # Allow cookies to be included in requests
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 actions = [
     {
@@ -58,8 +73,6 @@ def handle_new_action(email: Email):
 
 chat_instance = chat.Chat(True)
 
-
-email_loop(handle_new_action)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -129,7 +142,6 @@ async def generate(websocket: WebSocket):
 @app.get("/actions")
 def get_actions():
     resp = {"action_items": copy.deepcopy(actions)}
-    actions.clear()
     return resp
 
 
@@ -152,13 +164,6 @@ def validate_json(bruh: str):
         return []
 
 
-# @repeat_every(seconds=10)
-# def poll_action_items():
-#     print("Calling API...")
-#     # TODO: call gmail API -> action item function here
-#     r = random.randint(1, 100)
-#     if r % 5 == 0:
-#         # res = chat_instance.chat("Reminder - sign your job offer. Your offer will expire on 02/19/2023.")
-#         res = ""
-#         print("Item recognized!")
-#         actions.extend(validate_json(res))
+@repeat_every(seconds=10)
+def poll_action_items():
+    email_loop(handle_new_action)
