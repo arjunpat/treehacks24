@@ -16,7 +16,8 @@ import chat
 from chat import Chat
 
 # from chattest import main
-from main import main
+# from main import main
+from demo import main
 from photos_gmail import Email, email_loop
 
 # @asynccontextmanager

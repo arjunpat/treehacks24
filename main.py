@@ -33,6 +33,34 @@ with open(persona_notepad_file, "r") as f:
 # Can you suggest gifts for Gaurav Chak for his birthday?
 
 
+def retrieve_treehacks_email():
+    return """
+Subject: Welcome to TreeHacks! Parking Information Inside 🚗
+
+Dear Hackers,
+
+We are thrilled to have you join us for this year's TreeHacks event! As you embark on this exciting journey of innovation and creativity, we want to ensure your experience is as smooth and hassle-free as possible, starting with parking.
+
+For your convenience, we have arranged for two primary parking locations:
+
+Roble Field Garage - Located conveniently near the main event area, providing easy access to all the hackathon activities.
+Via Ortega Garage - A short walk from the event venue, this garage offers ample space and is an excellent option for those arriving from different parts of the campus or city.
+Parking Hours and Fees:
+We understand the importance of accessible parking, which is why we're pleased to inform you that parking at both Roble Field Garage and Via Ortega Garage is free after 4 PM on weekdays and completely free all day on weekends. This should accommodate your needs throughout the hackathon, allowing you to focus on what truly matters - bringing your innovative ideas to life!
+
+Need Assistance?
+Should you encounter any issues with parking or have any questions, please do not hesitate to contact us. We are here to assist you in any way we can to make your TreeHacks experience memorable and enjoyable.
+
+We are eagerly looking forward to seeing the incredible projects you will create and the unique solutions you will develop. Let's make this hackathon a remarkable event filled with creativity, collaboration, and innovation.
+
+Safe travels, and see you soon!
+
+Warm regards,
+
+The TreeHacks Organizing Team
+"""
+
+
 def retrieve_persona_notepad(phone_number: str):
     if phone_number not in messages:
         return "Expected a valid phone number of a contact."
