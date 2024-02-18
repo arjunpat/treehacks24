@@ -138,8 +138,8 @@ def get_most_recent_emails():
         subject = [i["value"] for i in headers if i["name"] == "Subject"][0]
         from_email = [i["value"] for i in headers if i["name"] == "From"][0]
         # print(f"From: {from_email}")
-        print(f"Subject: {subject}")
-        print("ID:", message["id"])
+        # print(f"Subject: {subject}")
+        # print("ID:", message["id"])
 
         email_body = get_email_body(msg["payload"])
         # if email_body:
@@ -150,7 +150,7 @@ def get_most_recent_emails():
 
         # print(f"Snippet: {msg['snippet']}")
 
-        print("\n")
+        # print("\n")
 
         emails.append(Email(from_email, subject, email_body, message["id"]))
 
@@ -167,18 +167,19 @@ def decode_content(byte_content):
             return byte_content.decode("utf-8", errors="replace")
 
 
+seen_emails = set()
+emails = get_most_recent_emails()
+seen_emails.update([email.id for email in emails])
+
+
 def email_loop(email_callback):
-    seen_emails = set()
+    global seen_emails
+    print("GETTING EMAILS")
     emails = get_most_recent_emails()
-    seen_emails.update([email.id for email in emails])
-    while True:
-        print("Checking for new emails...")
-        emails = get_most_recent_emails()
-        for email in emails:
-            if email.id not in seen_emails:
-                email_callback(email)
-                seen_emails.add(email.id)
-        time.sleep(10)  # Wait for ten seconds before checking again
+    for email in emails:
+        if email.id not in seen_emails:
+            email_callback(email)
+            seen_emails.add(email.id)
 
 
 # if __name__ == "__main__":
