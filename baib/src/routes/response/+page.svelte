@@ -2,8 +2,9 @@
 	import AnswerSection from '$lib/components/AnswerSection.svelte';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import Source from '$lib/components/Source.svelte';
+	import { query } from '$lib/stores';
 	import type { AnswerContent, Progress } from '$lib/types';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
@@ -59,12 +60,11 @@
 	// Run generate api call
 	let messageProgress: Progress = { done: false, text: '' };
 
+	let socket: WebSocket;
 	onMount(() => {
-		// console.log();
-		// return;
 		let socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
 		socket.onopen = (event) => {
-			socket.send(JSON.stringify({ question: "When is Clement's birthday?" }));
+			socket.send(JSON.stringify({ question: $query }));
 		};
 		socket.onmessage = (event) => {
 			const data = JSON.parse(event.data);
@@ -86,6 +86,10 @@
 			}
 		};
 	});
+
+	onDestroy(() => {
+		socket?.close();
+	});
 </script>
 
 <div class="container h-full w-full mx-auto p-4 flex flex-col gap-4">
@@ -95,7 +99,7 @@
 
 	<div>
 		<div class="font-bold text-xs">HEY BAIB,</div>
-		<div class="text-2xl">{question}</div>
+		<div class="text-2xl">{$query}</div>
 	</div>
 
 	<div>

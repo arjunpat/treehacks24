@@ -10,6 +10,7 @@
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import Todos from '$lib/components/Todos.svelte';
 	import { goto } from '$app/navigation';
+	import { query } from '$lib/stores';
 
 	let input = '';
 
@@ -39,9 +40,8 @@
 
 	function submit(event: any) {
 		console.log('submitted with text', event.detail.text);
-		// goto('/response', {
-		// 	state: { text: event.detail.text }
-		// });
+		query.set(event.detail.text);
+		goto('/response');
 	}
 
 	onMount(() => {
