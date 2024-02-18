@@ -3,27 +3,45 @@
   import { fade, scale, slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
   import { flip } from 'svelte/animate';
+  import { action_items } from '$lib/stores';
 
   let todos = [{text: "I'm a todo, you have to finish doing the form by the thing", id: '1', completed: false, deadline: new Date()}, {text: "I'm another todo", id: '2', completed: true, deadline: new Date()}, {text: "I'm another todo", id: '3', completed: true, deadline: new Date()}]
+  let completedMap = new Map();
 
   $: todosAmount = todos.length
   $: incompleteTodos = todos.filter((todo) => !todo.completed).length
   $: completedTodos = todos.filter((todo) => todo.completed).length
   $: sortedTodos = todos.sort((a, b) => (a.completed ? 1 : -1) - (b.completed ? 1 : -1))
 
-  function completeTodo(id: string): void {
-    todos = todos.map((todo) => {
-      if (todo.id === id) {
-        todo.completed = !todo.completed
-      }
-      return todo
-    })
+  function completeTodo(todo: any): void {
+
+    const actions = JSON.parse(JSON.stringify(action_items))
+    console.log(actions)
+      action_items.forEach((todo: any) => {
+        if (todo.name === todo.name) {
+          todo.completed = !todo.completed
+        }
+      })
   }
 
   let ready = false;
+  let new_todos;
+
+  const retrieveTodos = () => {
+		fetch("https://l6xbzhkc-8000.usw3.devtunnels.ms/actions")
+		.then(response => response.json())
+		.then(data => {
+      action_items.set(data["action_items"]);
+		}).catch(error => {
+			console.log(error);
+			return [];
+		});
+	}
 
 	onMount(() => {
 		ready = true;
+
+    retrieveTodos()
 	});
 </script>
 
@@ -36,9 +54,9 @@
   <section class="todos rounded-lg overflow-hidden card">
     {#if todosAmount}
       <ul class="todo-list">
-        {#each todos as todo (todo.id)}
+        {#each $action_items as todo (todo.name)}
         <div animate:flip={{ duration: 200 }}>
-          <Todo {todo} {completeTodo}  />
+          <Todo {todo} {completeTodo} {completedMap} />
         </div>
         {/each}
       </ul>
