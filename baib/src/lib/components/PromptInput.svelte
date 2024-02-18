@@ -22,10 +22,10 @@
 </script>
 
 {#if ready}
-	<div class="mt-2 flex gap-1 w-full" transition:fade>
+	<form on:submit|preventDefault={submit} class="mt-2 flex gap-1 w-full" transition:fade>
 		<input class="input rounded-lg" bind:value={input} placeholder="ask anything :)" />
 		<button on:click={submit} type="button" class="shrink-0 btn-icon variant-filled-surface"
 			><ArrowRightIcon /></button
 		>
-	</div>
+	</form>
 {/if}
