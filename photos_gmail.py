@@ -137,7 +137,8 @@ def get_most_recent_emails():
 if __name__ == "__main__":
     while True:
         print("Checking for new emails...")
-        get_most_recent_emails()
+        emails = get_most_recent_emails()
+        print(emails)
         time.sleep(10)  # Wait for ten seconds before checking again
 
 

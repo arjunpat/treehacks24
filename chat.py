@@ -90,8 +90,8 @@ class Chat:
 
     def _get_chat(self):
         completion = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            # model="gpt-4-turbo-preview",
+            # model="gpt-3.5-turbo",
+            model="gpt-4-turbo-preview",
             messages=self.history,
             temperature=0,
         )
