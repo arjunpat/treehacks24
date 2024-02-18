@@ -119,6 +119,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+
+persona_notepad.json
+
 # Environments
 .env
 .venv
@@ -163,3 +166,4 @@ cython_debug/
 
 credentials.json
 token.json
+.DS_Store

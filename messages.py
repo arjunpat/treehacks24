@@ -91,9 +91,10 @@ def read_imessages(db_path) -> dict:
                 print(decoded)
                 raise e
 
-        chats[chat_id].messages.append(
-            Message(text, apple_timestamp_to_datetime(date), sender_info)
-        )
+        if isinstance(text, str):
+            chats[chat_id].messages.append(
+                Message(text, apple_timestamp_to_datetime(date), sender_info)
+            )
 
         chats[chat_id].participants.add(sender_info)
 
