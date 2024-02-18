@@ -173,7 +173,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         upper = min(i + CONTEXT_LEN + 1, len(msg_list))
         msgs = []
         for i in range(lower, upper):
-            m = messages[phone_number].messages[idx]
+            m = messages[phone_number].messages[i]
             msgs.append((m.sender == phone_number, m))
         msg_str_list.append((idx, msgs))
     # msg_str_list is [(citationId, [(bool, text)])]
