@@ -169,8 +169,8 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
 
-        lower = max(0, i - CONTEXT_LEN)
-        upper = min(i + CONTEXT_LEN + 1, len(msg_list))
+        lower = max(0, idx - CONTEXT_LEN)
+        upper = min(idx + CONTEXT_LEN + 1, len(msg_list))
         msgs = []
         for i in range(lower, upper):
             m = messages[phone_number].messages[i]
