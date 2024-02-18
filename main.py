@@ -144,7 +144,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     CONTEXT_LEN = 4
 
     if "code" in query:
-        code_convo = """(1) Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
+        code_convo = """(1) Arjun - Nov 21, 2019, 12:49 pm: yo gonna grab my bag around 4 if that's cool
 (2) Tony - Nov 21, 2019, 1:15 pm: sg
 (3) Arjun - Nov 21, 2019, 3:49 pm: im here
 (4) Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
@@ -158,7 +158,10 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         for m in code_convo.splitlines():
             ms = m.split(": ")
             metadata = ms[0]
-            msg = ms[1]
+            dt = metadata.split("- ")[1]
+            date_format = "%b %d, %Y, %I:%M %p"
+            d = datetime.strptime(dt, date_format)
+            msg = Message(ms[1], d, metadata.split()[1])
             id = int(metadata.split()[0][1:-1])
             code_str_list.append((id, msg, "Arjun" not in metadata))
         return code_convo, code_str_list
