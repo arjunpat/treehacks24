@@ -145,7 +145,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 
     if "code" in query:
         code_convo = """(1) Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
-(2) Tony - Nov 21, 2019, 1:15: sg
+(2) Tony - Nov 21, 2019, 1:15 pm: sg
 (3) Arjun - Nov 21, 2019, 3:49 pm: im here
 (4) Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
 (5) Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
@@ -154,7 +154,13 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 (8) Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
 (9) Tony - Jan 13, 2023, 12:15 am: yea ofc
 (10) Tony - Jan 13, 2023, 12:15 am: 4993"""
-        code_str_list = [(m.split()[0], m.split()[1:], "Arjun" not in m) for m in code_convo.splitlines()]
+        code_str_list = []
+        for m in code_convo.splitlines():
+            ms = m.split(": ")
+            metadata = ms[0]
+            msg = ms[1]
+            id = int(metadata.split()[0][1:-1])
+            code_str_list.append((id, msg, "Arjun" not in metadata))
         return code_convo, code_str_list
 
     query = query.strip().replace(",", "").split(" ")
