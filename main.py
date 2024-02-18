@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import re
+from dataclasses import dataclass
 from datetime import datetime
 
 import chat
@@ -166,7 +167,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         person = contact_name if msg.sender == phone_number else msg.sender
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
-        msg_str_list.append((idx, msg))
+        msg_str_list.append((idx, msg, msg.sender == phone_number))
 
     return msg_str, msg_str_list
     if False:
@@ -256,8 +257,8 @@ It's important to note that the absence of clear evidence for a second individua
 
 
 async def main(query="", notify_callback=None):
-    query = "When was my last skiing trip with Amira and what did we do?"
-    # query = "What should I get Tony Xin for his birthday?"
+    # query = "When was my last skiing trip with Amira and what did we do?"
+    query = "When is Tony Xin's birthday?"
     # query = "What is Akash's birthday?"
     if query.strip() == "":
         return ""
@@ -291,15 +292,25 @@ async def main(query="", notify_callback=None):
                     get_cits.update((c - 1, c, c + 1))
 
                 final_cits = []
-                for c, m in text_msgs_citations:
+                for c, m, isOther in text_msgs_citations:
                     if c in get_cits:
-                        final_cits.append((c, m))
+                        final_cits.append(
+                            {
+                                "citationId": c,
+                                "messages": [
+                                    {
+                                        "speaker": "other" if isOther else "me",
+                                        "text": m.text,
+                                    }
+                                ],
+                            }
+                        )
 
                 print(final_cits)
 
                 return 0, ff_reponse, final_cits  # exit with success
                 # else:
-                return 1, final_response  # exit with no success
+                return 1, final_response, None  # exit with no success
         code, output = await call_func(r, notify_callback)
         if output:
             new_input = ""
@@ -318,7 +329,7 @@ async def main(query="", notify_callback=None):
         else:
             print("am confused", r)
             break
-    return 2, r  # exit with error
+    return 2, r, None  # exit with error
 
 
 if __name__ == "__main__":
