@@ -122,6 +122,9 @@ celerybeat.pid
 
 persona_notepad.json
 
+creds.json
+token.json
+
 # Environments
 .env
 .venv

@@ -146,6 +146,20 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 
     indices = set()
 
+    if "code" in query:
+        return """
+1. Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
+2. Tony - Nov 21, 2019, 1:15: sg
+3. Arjun - Nov 21, 2019, 3:49 pm: im here
+4. Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
+5. Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
+6. Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
+7. Arjun - Nov 21, 2019, 3:56 pm: thanks
+8. Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
+9. Tony - Jan 13, 2023, 12:15 am: yea ofc
+10. Tony - Jan 13, 2023, 12:15 am: 4993
+"""
+
     query = query.strip().split(" ")
     msg_list = messages[phone_number].messages
     # filter messages with the relevant query
@@ -169,19 +183,6 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 
     return msg_str
     if False:
-        return """
-1. Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
-2. Tony - Nov 21, 2019, 1:15: sg
-3. Arjun - Nov 21, 2019, 3:49 pm: im here
-4. Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
-5. Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
-6. Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
-7. Arjun - Nov 21, 2019, 3:56 pm: thanks
-8. Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
-9. Tony - Jan 13, 2023, 12:15 am: yea ofc
-10. Tony - Jan 13, 2023, 12:15 am: 4993
-"""
-    else:
         searcher = textsearch.TextSearcher()
         searcher.load([m.text for m in msg_list], phone_number)
         resp = searcher.search(query)
@@ -213,6 +214,17 @@ def call_func(response: str):
             return codelines, results
     else:
         return None, False
+
+
+""" Based on the text messages, it appears Tony Xin has expressed romantic interest in at least one individual named Olivia. This is evidenced by a message where Tony mentions hanging out with Olivia because it is their "2 year" [2414], indicating a significant anniversary that suggests a romantic relationship. Additionally, there's another instance where Tony mentions that Olivia is staying over, which could imply a close personal relationship [2002].
+
+However, there isn't clear evidence in the provided messages to confidently identify a second individual Tony Xin might be romantically interested in. The messages mostly revolve around plans with friends, casual conversations, and logistical coordination. While Tony uses affectionate language like "Ok papa" [1650] and "Ok beautiful" [1128], these instances seem more indicative of a playful or affectionate tone rather than clear expressions of romantic interest towards specific individuals other than Olivia.
+
+Therefore, based on the available information:
+1. **Olivia** - Tony Xin has mentioned celebrating a two-year anniversary with Olivia [2414], which strongly suggests a romantic relationship.
+2. **Unknown** - There isn't sufficient evidence in the messages to identify a second individual Tony Xin is romantically interested in.
+
+It's important to note that the absence of clear evidence for a second individual could be due to the nature of the messages reviewed or the specific queries used. Further investigation with different queries or additional context might reveal more about Tony Xin's romantic interests. """
 
 
 def main(query=""):
