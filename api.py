@@ -3,25 +3,22 @@ from datetime import datetime
 from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
 
+# from chattest import main
 from main import main
 
 app = FastAPI()
 
-
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
 
 class ActionItem:
     name: str
     brief_description: str
     due_date: datetime
 
-
 class Query(BaseModel):
     question: str
-
 
 @app.post("/query")
 def query(query: Query):
@@ -63,3 +60,9 @@ async def generate(websocket: WebSocket):
             status = "error"
     resp = {"status": status, "answer": ans}
     await websocket.send_json(resp)
+
+# response with whether there are action items to take
+@app.get("/actions")
+def get_actions():
+    actions = []
+    return {"actions": actions}
