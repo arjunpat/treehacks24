@@ -10,8 +10,8 @@
 	import { fade } from 'svelte/transition';
 	import showdown from 'showdown';
 
-	const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
-	// const WEBSOCKET_URL = 'ws://localhost:8000';
+	// const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
+	const WEBSOCKET_URL = 'ws://localhost:8000';
 
 	let citations = {
 		1: { speaker: 'other', text: 'Yo olivia and i are having our 2 year this weekend' },
@@ -91,6 +91,23 @@
 
 	// Run generate api call
 	let messageProgress: Progress = { done: false, text: '' };
+	let emailProgress: Progress = { done: false, text: '' };
+	let photoProgress: Progress = { done: false, text: '' };
+
+	function initHardcoded() {
+		setTimeout(() => {
+			emailProgress.text = 'Searching emails...';
+			setTimeout(() => {
+				emailProgress.done = true;
+			}, 5000);
+		}, 200);
+		setTimeout(() => {
+			photoProgress.text = 'Searching photos...';
+			setTimeout(() => {
+				photoProgress.done = true;
+			}, 9500);
+		}, 400);
+	}
 
 	let socket: WebSocket;
 	function init() {
@@ -165,6 +182,10 @@
 		showAnswer = false;
 		messageProgress = { done: false, text: '' };
 
+		emailProgress = { done: false, text: '' };
+		photoProgress = { done: false, text: '' };
+		initHardcoded();
+
 		socket?.close();
 		socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
 
@@ -223,8 +244,8 @@
 		<div class="space-y-2">
 			{#key $query}
 				<Source type="message" progress={messageProgress} />
-				<!-- <Source delay={200} type="email" message="Hi this is Tony" />
-			<Source delay={400} type="photo" message="Here are some photos:" /> -->
+				<Source delay={200} type="email" progress={emailProgress} />
+				<Source delay={400} type="photo" progress={photoProgress} />
 			{/key}
 		</div>
 	</div>

@@ -87,7 +87,7 @@
 				{/key}
 			</div>
 		{:else}
-			<div class="text-sm">Done parsing {typeString}</div>
+			<div transition:slide class="text-sm">Done parsing {typeString}</div>
 		{/if}
 	</div>
 {/if}
