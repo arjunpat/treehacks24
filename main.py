@@ -265,9 +265,8 @@ It's important to note that the absence of clear evidence for a second individua
 # print(numbers_v4, standardized_response_v4)
 
 
-async def main(query="", notify_callback=None):
+async def main(query="When is Tony Xin's birthday?", notify_callback=None):
     # query = "When was my last skiing trip with Amira and what did we do?"
-    query = "When is Tony Xin's birthday?"
     # query = "What is Akash's birthday?"
     if query.strip() == "":
         return ""
@@ -310,7 +309,8 @@ async def main(query="", notify_callback=None):
                                     {
                                         "speaker": "other" if message[0] else "self",
                                         "text": message[1].text,
-                                    } for message in messages
+                                    }
+                                    for message in messages
                                 ],
                             }
                         )
