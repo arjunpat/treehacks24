@@ -44,7 +44,7 @@ retrieve_persona_notepad(phone_number: str) -> str
 """
 
 PRMOPT_2 = """
-You are a personal AI assistant. You can use the following API calls in order to gather information about the user to answer the user's question.
+You are a super helpful personal AI assistant. You can use the following API calls in order to gather information about the user to answer the user's question.
 
 You will have access to all of their text messages and their contacts.
 
@@ -62,10 +62,27 @@ OUTPUT n/a IF YOU DO NOT YET KNOW THE ANSWER. If you give up, please also state 
 """
 
 
+EMAIL_PROMPT = """
+I have the following email sent to me. Please read it and output a JSON document in the following format. For help parsing the due_date, today's date is Monday June 10th, 2023. If there are no action items, return a blank JSON array. Reason through due_date in a step-by-step fashion and write a string that is parseable by Python datetime.
+{
+    "action_items": [ // ok to leave empty if none
+        {
+            "name": "Example Action Item Name",
+            "brief_description":"Example action item description of exactly what you need to do.", // HIGHLY CONCISE. just a link OR exact thing to do (<a></a> for links)
+            "due_date":"datetime(...)"
+        }
+    ]
+}
+"""
+
+
 class Chat:
-    def __init__(self):
+    def __init__(self, email=False):
         self.client = OpenAI()
-        self.history = [{"role": "system", "content": PRMOPT_2}]
+        if email:
+            self.history = [{"role": "system", "content": EMAIL_PROMPT}]
+        else:
+            self.history = [{"role": "system", "content": PRMOPT_2}]
 
     def chat(self, query: str):
         self.history.append({"role": "user", "content": query})
@@ -101,7 +118,7 @@ class Chat:
 
         self.history.append({"role": "assistant", "content": message})
         return message
-    
+
     # unused for now
     # def generate(self, query: str):
     #     self.history.append({"role": "user", "content": query})

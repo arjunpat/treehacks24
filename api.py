@@ -1,20 +1,24 @@
+from datetime import datetime
+
 from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
-from fastapi.responses import StreamingResponse
 
-from chattest import main, stream
+# from chattest import main
+from main import main
 
 app = FastAPI()
-
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+class ActionItem:
+    name: str
+    brief_description: str
+    due_date: datetime
 
 class Query(BaseModel):
     question: str
-
 
 @app.post("/query")
 def query(query: Query):
@@ -28,10 +32,12 @@ def query(query: Query):
         case _:
             status = "error"
     return {"status": status, "answer": ans}
-    
+
+
 # @app.post("/generate")
 # async def generate(query: Query):
 #     return StreamingResponse(stream(query.question), media_type='text/event-stream')
+
 
 @app.websocket("/generate")
 async def generate(websocket: WebSocket):
@@ -43,7 +49,7 @@ async def generate(websocket: WebSocket):
 
     body = await websocket.receive_json()
     # Start the long-running task and send progress updates
-    result, ans = await stream(body["question"], notify_progress)
+    result, ans = await main(body["question"], notify_progress)
     status = ""
     match result:
         case 0:
@@ -54,3 +60,9 @@ async def generate(websocket: WebSocket):
             status = "error"
     resp = {"status": status, "answer": ans}
     await websocket.send_json(resp)
+
+# response with whether there are action items to take
+@app.get("/actions")
+def get_actions():
+    actions = []
+    return {"actions": actions}
