@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import skiingImage1 from '../../assets/dynamic-images/skiing1.jpeg';
-	// import skiingImage2 from '../../assets/dynamic-images/skiing2.jpeg';
+	import skiingImage2 from '../../assets/dynamic-images/skiing2.jpg';
+	import skiingImage3 from '../../assets/dynamic-images/skiing2.jpg';
 
 	export let text: string;
 	let question_image = {
 		skiing: [
 			skiingImage1,
-			'https://l6xbzhkc-8000.usw3.devtunnels.ms/static/IMG_0988.jpg',
-			'https://l6xbzhkc-8000.usw3.devtunnels.ms/static/IMG_1977.jpg'
+			skiingImage2,
+			skiingImage3
 		],
 		week: []
 	};
