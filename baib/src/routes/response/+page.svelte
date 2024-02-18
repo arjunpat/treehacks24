@@ -13,7 +13,9 @@
 
 	<div>
 		<h4 class="h4 mb-2">Sources</h4>
-		<Source message="my birthday is on oct 10th LMAO" />
+		<Source
+			message="my birthday is on oct 10th LMAO ahhahah idk man this is a really really long message omgggggg"
+		/>
 	</div>
 
 	<div>
