@@ -8,6 +8,8 @@ from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from pydantic import BaseModel
+import chat
+import json
 
 # from chattest import main
 from main import main
@@ -24,12 +26,14 @@ app = FastAPI(lifespan=lifespan)
 
 actions = []
 
+chat_instance = chat.Chat(True)
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-app.mount(
-    "/static", StaticFiles(directory=os.path.join(dir_path, "static")), name="static"
-)
+# app.mount(
+#     "/static", StaticFiles(directory=os.path.join(dir_path, "static")), name="static"
+# )
 
 
 @app.get("/")
@@ -49,7 +53,7 @@ class Query(BaseModel):
 
 @app.post("/query")
 def query(query: Query):
-    result, ans = main(query.question)
+    result, ans, citations = main(query.question)
     status = ""
     match result:
         case 0:
@@ -58,7 +62,7 @@ def query(query: Query):
             status = "failure"
         case _:
             status = "error"
-    return {"status": status, "answer": ans}
+    return {"status": status, "answer": ans, "citations": citations}
 
 
 # @app.post("/generate")
@@ -76,7 +80,7 @@ async def generate(websocket: WebSocket):
 
     body = await websocket.receive_json()
     # Start the long-running task and send progress updates
-    result, ans = await main(body["question"], notify_progress)
+    result, ans, citations = await main(body["question"], notify_progress)
     status = ""
     match result:
         case 0:
@@ -85,17 +89,34 @@ async def generate(websocket: WebSocket):
             status = "failure"
         case _:
             status = "error"
-    resp = {"status": status, "answer": ans}
+    resp = {"status": status, "answer": ans, "citations": citations}
     await websocket.send_json(resp)
 
 
 # response with whether there are action items to take
 @app.get("/actions")
 def get_actions():
-    resp = {"actions": copy.deepcopy(actions)}
+    resp = {"action_items": copy.deepcopy(actions)}
     actions.clear()
     return resp
 
+# return list of action items (can be empty list)
+# hacky validation/parsing
+def validate_json(bruh: str):
+    if "```json" in bruh:
+        try:
+            b = json.loads(bruh[8:-3])
+            if "action_items" in b:
+                return b["action_items"]
+        except:
+            return []
+    try:
+        b = json.loads(bruh)
+        if "action_items" in b:
+            return b["action_items"]
+        return []
+    except:
+        return []
 
 @repeat_every(seconds=10)
 def poll_action_items():
@@ -103,5 +124,7 @@ def poll_action_items():
     # TODO: call gmail API -> action item function here
     r = random.randint(1, 100)
     if r % 5 == 0:
+        # res = chat_instance.chat("Reminder - sign your job offer. Your offer will expire on 02/19/2023.")
+        res = ""
         print("Item recognized!")
-        actions.append(r)
+        actions.extend(validate_json(res))

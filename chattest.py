@@ -105,9 +105,9 @@ async def main(q, notify_callback = None):
             if "n/a" not in final_response:
                 print("\n" * 10)
                 print(final_response)
-                return 0, final_response  # exit with success
+                return 0, final_response, ["citation 1", "citation 2"]  # exit with success
                 # else:
-                return 1, final_response  # exit with no success
+                return 1, final_response, None  # exit with no success
         code, output = await call_func(r, notify_callback)
         if output:
             new_input = ""
@@ -122,7 +122,7 @@ async def main(q, notify_callback = None):
         else:
             print("am confused", r)
             break
-    return 2, r  # exit with error
+    return 2, r, None  # exit with error
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

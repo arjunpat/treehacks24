@@ -43,7 +43,7 @@ save_to_persona_notepad(phone_number: str, info: str) -> None
 retrieve_persona_notepad(phone_number: str) -> str
 """
 
-PRMOPT_2 = """
+PROMPT_2 = """
 You are a super helpful personal AI assistant. You can use the following API calls in order to gather information about the user to answer the user's question.
 
 You will have access to all of their text messages and their contacts.
@@ -63,7 +63,7 @@ OUTPUT n/a IF YOU DO NOT YET KNOW THE ANSWER. If you give up, please also state 
 
 
 EMAIL_PROMPT = """
-I have the following email sent to me. Please read it and output a JSON document in the following format. For help parsing the due_date, today's date is Monday June 10th, 2023. If there are no action items, return a blank JSON array. Reason through due_date in a step-by-step fashion and write a string that is parseable by Python datetime.
+I have the following email sent to me. Please read it and output a JSON document in the following format. For help parsing the due_date, today's date is Sunday February 18th, 2023. If there are no action items, return a blank JSON array. Reason through due_date in a step-by-step fashion and write a string that is parseable by Python datetime.
 {
     "action_items": [ // ok to leave empty if none
         {
@@ -79,14 +79,31 @@ I have the following email sent to me. Please read it and output a JSON document
 class Chat:
     def __init__(self, email=False):
         self.client = OpenAI()
+        self.email = email
         if email:
             self.history = [{"role": "system", "content": EMAIL_PROMPT}]
         else:
-            self.history = [{"role": "system", "content": PRMOPT_2}]
+            self.history = [{"role": "system", "content": PROMPT_2}]
 
     def chat(self, query: str):
+        if self.email:
+            return self.chat_without_history(query)
         self.history.append({"role": "user", "content": query})
         return self._get_chat()
+
+    def chat_without_history(self, query: str):
+        completion = self.client.chat.completions.create(
+            # model="gpt-3.5-turbo",
+            model="gpt-4-turbo-preview",
+            messages=[
+                {"role": "system", "content": EMAIL_PROMPT},
+                {"role": "user", "content": query}
+            ],
+            temperature=0,
+        )
+        message = completion.choices[0].message.content
+
+        return message
 
     def _get_chat(self):
         completion = self.client.chat.completions.create(
