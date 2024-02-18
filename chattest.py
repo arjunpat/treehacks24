@@ -73,7 +73,7 @@ def main(q):
     while True:
         if "USER_OUTPUT:" in r:
             print(r)
-            break
+            return 0, r
         code, output = call_func(r)
         if output:
             print(r)
@@ -84,6 +84,7 @@ def main(q):
         else:
             print("am confused", r)
             break
+    return 2, r
 
 if __name__ == "__main__":
     main("When is Tony's birthday?")
