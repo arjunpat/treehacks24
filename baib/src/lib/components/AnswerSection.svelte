@@ -11,11 +11,11 @@
 			<div class="card p-2 text-sm space-y-2 flex flex-col">
 				{#each a.messages as id}
 					{#if citations[id]?.speaker === 'other'}
-						<div class="px-2 py-2 rounded-xl bg-[#3B3B3D] max-w-72 self-start">
+						<div class="px-2 py-2 rounded-xl bg-[#3B3B3D] max-w-72 self-start break-words">
 							{citations[id]?.text}
 						</div>
 					{:else if citations[id]?.speaker === 'self'}
-						<div class="px-2 py-2 rounded-xl bg-[#1A89FF] max-w-72 self-end">
+						<div class="px-2 py-2 rounded-xl bg-[#1A89FF] max-w-72 self-end break-words">
 							{citations[id]?.text}
 						</div>
 					{/if}

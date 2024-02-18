@@ -34,6 +34,7 @@
 		.then(response => response.json())
 		.then(data => {
       action_items.set(data["action_items"]);
+      retrieveTodos();
 		}).catch(error => {
 			console.log(error);
       clearInterval(interval)
@@ -44,7 +45,7 @@
 	onMount(() => {
 		ready = true;
 
-    setInterval(retrieveTodos, 1000)
+    retrieveTodos();
 	});
 </script>
 
