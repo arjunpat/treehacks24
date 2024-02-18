@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AnswerSection from '$lib/components/AnswerSection.svelte';
 	import PromptInput from '$lib/components/PromptInput.svelte';
+	import ImageSection from '$lib/components/ImageSection.svelte';
 	import Source from '$lib/components/Source.svelte';
 	import type { AnswerContent, Progress } from '$lib/types';
 	import { onMount } from 'svelte';
@@ -62,9 +63,18 @@
 	onMount(() => {
 		// console.log();
 		// return;
+		
+		showAnswer = true;
+	});
+
+	const handleSubmit = (e: any) => {
+		console.log(e.detail.text)
+		question = e.detail.text;
+		showAnswer = false;
+
 		let socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
 		socket.onopen = (event) => {
-			socket.send(JSON.stringify({ question: "When is Clement's birthday?" }));
+			socket.send(JSON.stringify({ question: e.detail.text }));
 		};
 		socket.onmessage = (event) => {
 			const data = JSON.parse(event.data);
@@ -85,7 +95,7 @@
 				showAnswer = true;
 			}
 		};
-	});
+	}
 </script>
 
 <div class="container h-full w-full mx-auto p-4 flex flex-col gap-4">
@@ -110,7 +120,10 @@
 	{#if showAnswer}
 		<div transition:fade>
 			<h4 class="h4 mb-2">Answer</h4>
+			<ImageSection text={question}></ImageSection>
 			<AnswerSection {answer} />
+			<div class="h-4"></div>
+			<PromptInput on:submit={handleSubmit}></PromptInput>
 		</div>
 	{/if}
 
