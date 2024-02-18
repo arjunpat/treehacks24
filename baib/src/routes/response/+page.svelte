@@ -13,9 +13,11 @@
 
 	<div>
 		<h4 class="h4 mb-2">Sources</h4>
-		<Source
-			message="my birthday is on oct 10th LMAO ahhahah idk man this is a really really long message omgggggg"
-		/>
+		<div class="space-y-2">
+			<Source type="message" message="my birthday is on oct 10th LMAO" />
+			<Source type="email" message="Hi this is Tony" />
+			<Source type="photo" message="Here are some photos:" />
+		</div>
 	</div>
 
 	<div>

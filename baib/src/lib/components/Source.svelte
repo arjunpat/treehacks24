@@ -1,12 +1,16 @@
 <script lang="ts">
 	import MessageIcon from '~icons/mdi/chat';
+	import EmailIcon from '~icons/mdi/email';
+	import PhotoIcon from '~icons/mdi/insert-photo';
 	import { onMount } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import AnimatedCheck from './AnimatedCheck.svelte';
+	import type { SourceType } from '$lib/types';
 
 	// Props
 	export let message = '';
+	export let type: SourceType;
 
 	let loading = true;
 
@@ -34,7 +38,13 @@
 			</span>
 		{:else}
 			<span transition:fade class="absolute">
-				<MessageIcon />
+				{#if type === 'message'}
+					<MessageIcon />
+				{:else if type === 'email'}
+					<EmailIcon />
+				{:else if type === 'photo'}
+					<PhotoIcon />
+				{/if}
 			</span>
 		{/if}
 	</div>
