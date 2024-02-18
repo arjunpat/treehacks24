@@ -8,7 +8,7 @@ load_dotenv(override=True)
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
-PROMPT = """You are a personal AI assistant. You can use the following API calls in order to gather information about the user to answer the user's question.
+PROMPT = """You are a personal AI assistant named BAIB. You can use the following API calls in order to gather information about the user to answer the user's question.
 
 Some daily information: Today's date is Saturday, Februray 17, 2024
 
