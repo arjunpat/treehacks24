@@ -131,6 +131,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     contact_name = f"{contact.first_name} {contact.last_name}"
 
     indices = set()
+    CONTEXT_LEN = 7
 
     if "code" in query:
         return """
@@ -153,21 +154,29 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         for j in range(len(query)):
             if query[j].lower() in msg_list[i].text.lower():
                 # grab 7 around each relevant
-                lower = max(0, i - 7)
-                upper = min(i + 7 + 1, len(msg_list))
+                lower = max(0, i - CONTEXT_LEN)
+                upper = min(i + CONTEXT_LEN + 1, len(msg_list))
                 indices.update(list(range(lower, upper)))
 
     # grab those messages
     # print(indices)
     msg_str = ""
-    msg_str_list: list[tuple[int, Message]] = []
+    msg_str_list: list[tuple[int, list[tuple[bool, str]]]] = []
     for idx in indices:
         msg = messages[phone_number].messages[idx]
         date_str = format_datetime(msg.date)
         person = contact_name if msg.sender == phone_number else msg.sender
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
-        msg_str_list.append((idx, msg, msg.sender == phone_number))
+
+        lower = max(0, i - CONTEXT_LEN)
+        upper = min(i + CONTEXT_LEN + 1, len(msg_list))
+        msgs = []
+        for i in range(lower, upper):
+            m = messages[phone_number].messages[idx]
+            msgs.append((m.sender == phone_number, m))
+        msg_str_list.append((idx, msgs))
+    # msg_str_list is [(citationId, [(bool, text)])]
 
     return msg_str, msg_str_list
     if False:
@@ -288,20 +297,20 @@ async def main(query="", notify_callback=None):
 
                 get_cits = set()
                 for num_str in cits:
-                    c = int(num_str)
-                    get_cits.update((c - 1, c, c + 1))
+                    citation_id = int(num_str)
+                    get_cits.update((citation_id - 1, citation_id, citation_id + 1))
 
                 final_cits = []
-                for c, m, isOther in text_msgs_citations:
-                    if c in get_cits:
+                for citation_id, messages in text_msgs_citations:
+                    if citation_id in get_cits:
                         final_cits.append(
                             {
-                                "citationId": c,
+                                "citationId": citation_id,
                                 "messages": [
                                     {
-                                        "speaker": "other" if isOther else "me",
-                                        "text": m.text,
-                                    }
+                                        "speaker": "other" if message[0] else "self",
+                                        "text": message[1].text,
+                                    } for message in messages
                                 ],
                             }
                         )
