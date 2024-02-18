@@ -47,7 +47,7 @@ Some daily information: Today's date is Saturday, Februray 17, 2024
 You will have access to all of their text messages and their contacts.
 
 query_contacts_by_name(name: str) -> list[Contact]
-query_text_messages_from_contact(phone_number: str, query: str) -> list[Message] *query must be a singular word*
+query_text_messages_from_contact(phone_number: str, question: str) -> list[Message]
 save_to_persona_notepad(phone_number: str, info: str) -> None
 retrieve_persona_notepad(phone_number: str) -> str
 
