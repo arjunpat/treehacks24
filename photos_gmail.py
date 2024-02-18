@@ -1,7 +1,9 @@
 import base64
 import os
 import time
+from dataclasses import dataclass
 from datetime import datetime
+from email import message_from_bytes
 from io import BytesIO
 
 import requests
@@ -88,60 +90,98 @@ def retrieve_photos():
     #     image.show()
 
 
+def get_email_body(part):
+    if part["mimeType"] == "text/plain":
+        data = part["body"]["data"]
+        text = base64.urlsafe_b64decode(data.encode("ASCII")).decode("utf-8")
+        return text
+    elif part["mimeType"] == "text/html":
+        # You can also handle HTML content here if needed
+        pass
+    elif "parts" in part:
+        for subpart in part["parts"]:
+            text = get_email_body(subpart)
+            if text:  # If text is found in any subpart, return it
+                return text
+    return None  # Return None if no 'text/plain' part is found
+
+
+@dataclass
+class Email:
+    from_email: str
+    subject: str
+    email_body: str
+    id: str
+
+
 def get_most_recent_emails():
-    creds = authenticate()
+    creds = authenticate()  # Ensure this function returns authenticated credentials
     service = build("gmail", "v1", credentials=creds)
+    emails = []
 
     results = (
         service.users()
         .messages()
-        .list(
-            userId="me", labelIds=["INBOX"], maxResults=10
-        )  # Reduced maxResults for quicker testing
+        .list(userId="me", labelIds=["INBOX"], maxResults=10)
         .execute()
     )
     messages = results.get("messages", [])
-    emails_strings = []  # Initialize an empty string to hold the email details
 
-    if not messages:
-        print("No new emails.")
-    else:
-        for message in messages:
-            msg = (
-                service.users()
-                .messages()
-                .get(userId="me", id=message["id"], format="full")
-                .execute()
-            )
-            headers = msg["payload"]["headers"]
-            subject = [i["value"] for i in headers if i["name"] == "Subject"][0]
-            from_email = [i["value"] for i in headers if i["name"] == "From"][0]
-            email_body = "Email Body Not Available in Plain Text"
+    for message in messages:
+        msg = (
+            service.users()
+            .messages()
+            .get(userId="me", id=message["id"], format="full")
+            .execute()
+        )
+        headers = msg["payload"]["headers"]
+        subject = [i["value"] for i in headers if i["name"] == "Subject"][0]
+        from_email = [i["value"] for i in headers if i["name"] == "From"][0]
+        # print(f"From: {from_email}")
+        # print(f"Subject: {subject}")
+        # print("ID:", message["id"])
 
-            if "parts" in msg["payload"]:
-                for part in msg["payload"]["parts"]:
-                    if part["mimeType"] == "text/plain":
-                        data = part["body"]["data"]
-                        email_body = base64.urlsafe_b64decode(
-                            data.encode("ASCII")
-                        ).decode("utf-8")
+        email_body = get_email_body(msg["payload"])
+        # if email_body:
+        #     print("Email Body:")
+        #     # print(email_body)
+        # else:
+        #     print("Email Body Not Available in Plain Text")
 
-            # Append the details of each email to the emails_string
-            emails_strings.append(
-                f"From: {from_email}\nSubject: {subject}\n{email_body}\n\n"
-            )
+        # print(f"Snippet: {msg['snippet']}")
 
-    return emails_strings  # Return the concatenated string of emails
+        # print("\n")
+
+        emails.append(Email(from_email, subject, email_body, message["id"]))
+
+    return emails
 
 
-if __name__ == "__main__":
-    while True:
-        print("Checking for new emails...")
-        emails = get_most_recent_emails()
-        print(emails)
-        time.sleep(10)  # Wait for ten seconds before checking again
+def decode_content(byte_content):
+    try:
+        return byte_content.decode("utf-8")
+    except UnicodeDecodeError:
+        try:
+            return byte_content.decode("iso-8859-1")
+        except UnicodeDecodeError:
+            return byte_content.decode("utf-8", errors="replace")
 
 
-if __name__ == "__main__":
-    # retrieve_photos()
-    get_most_recent_emails()
+seen_emails = set()
+emails = get_most_recent_emails()
+seen_emails.update([email.id for email in emails])
+
+
+def email_loop(email_callback):
+    global seen_emails
+    print("GETTING EMAILS")
+    emails = get_most_recent_emails()
+    for email in emails:
+        if email.id not in seen_emails:
+            email_callback(email)
+            seen_emails.add(email.id)
+
+
+# if __name__ == "__main__":
+# retrieve_photos()
+# get_most_recent_emails()

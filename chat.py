@@ -63,16 +63,16 @@ OUTPUT n/a IF YOU DO NOT YET KNOW THE ANSWER. If you give up, please also state 
 
 
 EMAIL_PROMPT = """
-I have the following email sent to me. Please read it and output a JSON document in the following format. For help parsing the due_date, today's date is Sunday February 18th, 2023. If there are no action items, return a blank JSON array. Reason through due_date in a step-by-step fashion and write a string that is parseable by Python datetime.
-{
+I have the following email sent to me. Please read it and output a JSON document in the following format. For help parsing the due_date, today's date is Sun Feb 18, 2024. If there are no action items, return a blank JSON array. Reason through due_date in a step-by-step fashion and write a string that is parseable by Python datetime.
+```json{
     "action_items": [ // ok to leave empty if none
         {
             "name": "Example Action Item Name",
             "brief_description":"Example action item description of exactly what you need to do.", // HIGHLY CONCISE. just a link OR exact thing to do (<a></a> for links)
-            "due_date":"datetime(...)"
+            "due_date":"datetime(...)" // include time (like 11:59 PM if necessary)
         }
     ]
-}
+}```
 """
 
 
@@ -97,7 +97,7 @@ class Chat:
             model="gpt-4-turbo-preview",
             messages=[
                 {"role": "system", "content": EMAIL_PROMPT},
-                {"role": "user", "content": query}
+                {"role": "user", "content": query},
             ],
             temperature=0,
         )

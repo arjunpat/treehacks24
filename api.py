@@ -1,30 +1,75 @@
 import copy
+import json
 import os
 import random
+import threading
 from contextlib import asynccontextmanager
 from datetime import datetime
 
 from fastapi import FastAPI, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from pydantic import BaseModel
+
 import chat
-import json
+from chat import Chat
 
 # from chattest import main
 from main import main
+from photos_gmail import Email, email_loop
+
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     print("Polling for action items...")
+#     await poll_action_items()
+#     yield
+allowed_origins = [
+    "http://localhost:3000",  # Allow frontend running on localhost:3000
+    "https://example.com",  # Allow a specific domain
+    # Add any other origins as needed
+    "*",
+]
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,  # List of allowed origins
+    allow_credentials=True,  # Allow cookies to be included in requests
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
+actions = [
+    {
+        "name": "Complete Hackathon Participation Confirmation Form",
+        "brief_description": "<a href='http://randomformlink6.com/'>Complete the confirmation form</a>",
+        "due_date": datetime(2023, 6, 14, 23, 59),
+    }
+]
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Polling for action items...")
-    await poll_action_items()
-    yield
+def handle_new_action(email: Email):
+    global actions
+    email_str = (
+        f"From: {email.from_email}\nSubject: {email.subject}\n\n{email.email_body}"
+    )
+    c = Chat(email=True)
+    r = c.chat(email_str)
+    if "```json" in r:
+        idx = r.index("```json")
+        r = r[idx + len("```json") :]
+        idx = r.index("```")
+        r = r[:idx]
 
+        action_item = json.loads(r)["action_items"]
+        print(action_item)
+        action_item["due_date"] = eval(action_item["due_date"])
+        actions += action_item
+        print(actions)
+    print(r)
 
-app = FastAPI(lifespan=lifespan)
-
-actions = []
 
 chat_instance = chat.Chat(True)
 
@@ -97,8 +142,8 @@ async def generate(websocket: WebSocket):
 @app.get("/actions")
 def get_actions():
     resp = {"action_items": copy.deepcopy(actions)}
-    actions.clear()
     return resp
+
 
 # return list of action items (can be empty list)
 # hacky validation/parsing
@@ -118,13 +163,7 @@ def validate_json(bruh: str):
     except:
         return []
 
+
 @repeat_every(seconds=10)
 def poll_action_items():
-    print("Calling API...")
-    # TODO: call gmail API -> action item function here
-    r = random.randint(1, 100)
-    if r % 5 == 0:
-        # res = chat_instance.chat("Reminder - sign your job offer. Your offer will expire on 02/19/2023.")
-        res = ""
-        print("Item recognized!")
-        actions.extend(validate_json(res))
+    email_loop(handle_new_action)

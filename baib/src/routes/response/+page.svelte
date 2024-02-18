@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import AnswerSection from '$lib/components/AnswerSection.svelte';
 	import PromptInput from '$lib/components/PromptInput.svelte';
+	import ImageSection from '$lib/components/ImageSection.svelte';
 	import Source from '$lib/components/Source.svelte';
 	import { query } from '$lib/stores';
 	import type { AnswerContent, Progress } from '$lib/types';
@@ -73,7 +74,7 @@
 
 		socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
 		socket.onopen = (event) => {
-			socket.send(JSON.stringify({ question: $query }));
+			socket.send(JSON.stringify({ question: e.detail.text }));
 		};
 		socket.onmessage = (event) => {
 			const data = JSON.parse(event.data);
@@ -134,6 +135,7 @@
 	{#if showAnswer}
 		<div transition:fade>
 			<h4 class="h4 mb-2">Answer</h4>
+			<ImageSection text={$query}></ImageSection>
 			<AnswerSection {answer} />
 		</div>
 	{/if}
