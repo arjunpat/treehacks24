@@ -139,7 +139,10 @@ def call_func(response: str):
     else:
         return None, False
 
-def main():
+def main(q):
+    q = "When is Tony's birthday?"
+    if q.strip() == "":
+        return
     # result = query_contacts_by_name("Tony")
     # print(result)
     # print("\n" * 10)
@@ -148,12 +151,12 @@ def main():
 
     chat_instance = chat.Chat()
 
-    r = chat_instance.chat("When is Tony's birthday?")
+    r = chat_instance.chat(q)
 
     while True:
         if "USER_OUTPUT:" in r:
             print(r)
-            break
+            return r
         code, output = call_func(r)
         if output:
             print(r)

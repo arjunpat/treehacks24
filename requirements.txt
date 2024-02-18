@@ -107,3 +107,5 @@ fastembed
 openai 
 tiktoken
 python-dotenv
+fastapi==0.109.2
+uvicorn==0.23.2
