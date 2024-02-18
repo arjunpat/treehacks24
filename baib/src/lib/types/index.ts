@@ -20,3 +20,8 @@ export type Message = {
 	speaker: 'other' | 'self';
 	text: string;
 };
+
+export type Progress = {
+	done: boolean;
+	text: string;
+};

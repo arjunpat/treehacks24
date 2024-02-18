@@ -2,7 +2,7 @@
 	import AnswerSection from '$lib/components/AnswerSection.svelte';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import Source from '$lib/components/Source.svelte';
-	import type { AnswerContent } from '$lib/types';
+	import type { AnswerContent, Progress } from '$lib/types';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
@@ -47,11 +47,39 @@
 
 	let input = '';
 
-	let showAnswer = true;
+	let showAnswer = false;
+	// onMount(() => {
+	// 	setTimeout(() => {
+	// 		showAnswer = true;
+	// 	}, 3000);
+	// });
+
+	// Run generate api call
+	let messageProgress: Progress = { done: false, text: '' };
+
 	onMount(() => {
-		setTimeout(() => {
-			showAnswer = true;
-		}, 3000);
+		let socket = new WebSocket('ws://localhost:8000/generate');
+		socket.onopen = (event) => {
+			socket.send(JSON.stringify({ question: "When is Clement's birthday?" }));
+		};
+		socket.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			if (data.status === 'progress') {
+				const insideQuoteRegex = /"(.+?)"/g;
+				if (data.progress.includes('query_contacts_by_name')) {
+					const matches = [...data.progress.matchAll(insideQuoteRegex)];
+					const name = matches[0][1];
+					messageProgress.text = `Analyzing texts from ${name}...`;
+				} else if (data.progress.includes('query_text_messages_from_contact')) {
+					const matches = [...data.progress.matchAll(insideQuoteRegex)];
+					const keywords = matches[1][1];
+					messageProgress.text = `Looking for texts related to ${keywords}...`;
+				}
+			} else if (data.status === 'success') {
+				messageProgress.done = true;
+				showAnswer = true;
+			}
+		};
 	});
 </script>
 
@@ -68,9 +96,9 @@
 	<div>
 		<h4 class="h4 mb-2">Sources</h4>
 		<div class="space-y-2">
-			<Source type="message" message="my birthday is on oct 10th LMAO" />
-			<Source delay={200} type="email" message="Hi this is Tony" />
-			<Source delay={400} type="photo" message="Here are some photos:" />
+			<Source type="message" progress={messageProgress} />
+			<!-- <Source delay={200} type="email" message="Hi this is Tony" />
+			<Source delay={400} type="photo" message="Here are some photos:" /> -->
 		</div>
 	</div>
 

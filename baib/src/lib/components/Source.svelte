@@ -3,29 +3,51 @@
 	import EmailIcon from '~icons/mdi/email';
 	import PhotoIcon from '~icons/mdi/insert-photo';
 	import { onMount } from 'svelte';
-	import { fade, slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import AnimatedCheck from './AnimatedCheck.svelte';
-	import type { SourceType } from '$lib/types';
+	import type { Progress, SourceType } from '$lib/types';
 
 	// Props
-	export let message = '';
 	export let type: SourceType;
 	export let delay = 0;
+	export let progress: Progress = { done: false, text: '' };
+
+	let typeString = '';
+	$: {
+		switch (type) {
+			case 'message':
+				typeString = 'messages';
+				break;
+			case 'email':
+				typeString = 'emails';
+				break;
+			case 'photo':
+				typeString = 'photos';
+				break;
+		}
+	}
 
 	let visible = false;
 	let loading = true;
 
 	let showCheckmark = false;
+
+	$: progress, onProgressChanged();
+	function onProgressChanged() {
+		if (progress.done) {
+			loading = false;
+		}
+	}
+
 	$: if (!loading) {
-		// Show checkmark after we stop loading
 		showCheckmark = true;
 		setTimeout(() => (showCheckmark = false), 1000);
 	}
 
 	onMount(() => {
 		setTimeout(() => (visible = true), delay);
-		setTimeout(() => (loading = false), 1000 + delay);
+		// setTimeout(() => (loading = false), 1000 + delay);
 	});
 </script>
 
@@ -52,8 +74,20 @@
 				</span>
 			{/if}
 		</div>
-		{#if !loading && !showCheckmark}
-			<div transition:slide={{ delay: 100 }} class="text-sm">"{message}"</div>
+		{#if loading}
+			<div class="grid">
+				{#key progress.text}
+					<div
+						in:slide={{ delay: 300 }}
+						out:slide
+						class="text-sm col-start-1 col-end-2 row-start-1 row-end-2"
+					>
+						{progress.text}
+					</div>
+				{/key}
+			</div>
+		{:else}
+			<div class="text-sm">Done parsing {typeString}</div>
 		{/if}
 	</div>
 {/if}
