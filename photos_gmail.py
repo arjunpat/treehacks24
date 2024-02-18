@@ -7,10 +7,11 @@ from PIL import Image
 from io import BytesIO
 import requests
 from datetime import datetime
+import base64
 
 
 # Google Photos API scope
-SCOPES = ["https://www.googleapis.com/auth/photoslibrary.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/photoslibrary.readonly", 'https://www.googleapis.com/auth/gmail.readonly']
 API_VERSION = "v1"
 
 
@@ -75,5 +76,39 @@ def retrieve_photos():
     #     image = Image.open(BytesIO(img_data))
     #     image.show()
 
+def get_most_recent_emails():
+    creds = authenticate()
+    service = build('gmail', 'v1', credentials=creds)
+
+    results = service.users().messages().list(userId='me', labelIds=['INBOX'], maxResults=100).execute()
+    messages = results.get('messages', [])
+
+    for message in messages:
+        msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
+        headers = msg['payload']['headers']
+        subject = [i['value'] for i in headers if i['name'] == 'Subject'][0]
+        from_email = [i['value'] for i in headers if i['name'] == 'From'][0]
+        print(f"From: {from_email}")
+        print(f"Subject: {subject}")
+
+        # This gets the whole email lowkey can j use snippet tho
+        # if 'parts' in msg['payload']:
+        #     for part in msg['payload']['parts']:
+        #         if part['mimeType'] == 'text/plain':
+        #             data = part['body']['data']
+        #             text = base64.urlsafe_b64decode(data.encode('ASCII')).decode('utf-8')
+        #             print("Email Body:")
+        #             print(text)
+        # else:
+        #     print("Email Body Not Available in Plain Text")
+
+
+        print(f"Snippet: {msg['snippet']}")
+
+        print("\n")
+
+
+
 if __name__ == "__main__":
-    retrieve_photos()
+    # retrieve_photos()
+    get_most_recent_emails()
