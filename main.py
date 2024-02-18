@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import pickle
 import re
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,7 +13,15 @@ from messages import Message, read_imessages
 
 db_path = os.path.expanduser("~/Downloads/chat.db")
 contacts = get_contacts()
-messages = read_imessages(db_path)
+# messages = read_imessages(db_path)
+
+
+# with open("message_cache.pkl", "wb") as f:
+# pickle.dump(messages, f)
+
+with open("message_cache.pkl", "rb") as f:
+    messages = pickle.load(f)
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 persona_notepad_file = os.path.join(dir_path, "persona_notepad.json")
@@ -56,7 +65,8 @@ def format_datetime(dt):
     Returns:
     str: The formatted datetime string.
     """
-    return dt.strftime("%d %b %Y at %I:%M %p")
+    # return dt.strftime("%d %b %Y at %I:%M %p")
+    return dt.strftime("%d %b %Y")
 
 
 def query_contacts_by_name(name: str):
@@ -164,7 +174,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     msg_str_list: list[tuple[int, Message]] = []
     for idx in indices:
         msg = messages[phone_number].messages[idx]
-        if len(msg.text) > 5 and len(msg.text) < 125:
+        if len(msg.text) > 5 and len(msg.text) < 90:
             date_str = format_datetime(msg.date)
             person = contact_name if msg.sender == phone_number else msg.sender
 
