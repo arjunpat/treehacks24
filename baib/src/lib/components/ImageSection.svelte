@@ -29,7 +29,7 @@
 </script>
 
 {#if images.length > 0}
-	<div class="p-4 gap-2 card mb-4" transition:fade>
+	<div class="p-4 gap-2 card mb-4 flex" transition:fade>
 		{#each images as image (image)}
 			<img alt={image} src={image} class="w-32 rounded-lg" />
 		{/each}
