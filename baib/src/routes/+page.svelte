@@ -9,6 +9,7 @@
 	import { fade, scale, slide } from 'svelte/transition';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import Todos from '$lib/components/Todos.svelte';
+	import { goto } from '$app/navigation';
 
 	let input = '';
 
@@ -34,6 +35,13 @@
 		setInterval(() => {
 			showCursor = !showCursor;
 		}, 500);
+	}
+
+	function submit(event: any) {
+		console.log('submitted with text', event.detail.text);
+		// goto('/response', {
+		// 	state: { text: event.detail.text }
+		// });
 	}
 
 	onMount(() => {
@@ -112,7 +120,7 @@
 			{/if}
 
 			{#if ready}
-				<PromptInput bind:input></PromptInput>
+				<PromptInput bind:input on:submit={submit}></PromptInput>
 			{/if}
 		</div>
 	</div>
