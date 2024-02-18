@@ -6,8 +6,8 @@
 	import imLogo from '../assets/imessage.png';
 	import gmailLogo from '../assets/gmail.png';
 	import gPhotos from '../assets/gphotos.png';
-	import ArrowRightIcon from '~icons/mdi/arrow-right';
 	import { fade, scale } from 'svelte/transition';
+	import PromptInput from '$lib/components/PromptInput.svelte';
 
 	let input = '';
 
@@ -100,11 +100,7 @@
 				{/if}
 
 				{#if ready}
-					<div class="mt-2 flex gap-1 w-full" transition:fade>
-						<input class="input rounded-lg" bind:value={input} placeholder="ask anything :)" />
-						<button type="button" class="btn-icon variant-filled-surface"><ArrowRightIcon /></button
-						>
-					</div>
+					<PromptInput bind:input={input}></PromptInput>
 				{/if}
 			</div>
 		</div>
