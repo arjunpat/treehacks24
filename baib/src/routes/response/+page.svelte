@@ -10,8 +10,8 @@
 	import { fade } from 'svelte/transition';
 	import showdown from 'showdown';
 
-	// const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
-	const WEBSOCKET_URL = 'ws://localhost:8000';
+	const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
+	// const WEBSOCKET_URL = 'ws://localhost:8000';
 
 	let citations = {
 		1: { speaker: 'other', text: 'Yo olivia and i are having our 2 year this weekend' },
