@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
-from fastapi.responses import StreamingResponse
 
 from main import main
 
@@ -10,6 +11,12 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+class ActionItem:
+    name: str
+    brief_description: str
+    due_date: datetime
 
 
 class Query(BaseModel):
@@ -28,10 +35,12 @@ def query(query: Query):
         case _:
             status = "error"
     return {"status": status, "answer": ans}
-    
+
+
 # @app.post("/generate")
 # async def generate(query: Query):
 #     return StreamingResponse(stream(query.question), media_type='text/event-stream')
+
 
 @app.websocket("/generate")
 async def generate(websocket: WebSocket):
