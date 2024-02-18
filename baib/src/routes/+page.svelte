@@ -69,11 +69,11 @@
 				/>
 			{/if}
 
-			<div class="w-full absolute bottom-0 p-5">
+			<div class="w-full absolute bottom-0 p-4">
 				{#if ready}
-					<div class="w-full mt-24" transition:fade>
+					<div class="w-full mt-24 space-y-2" transition:fade>
 						<h1>Searches through</h1>
-						<div class="card p-4 mt-1 flex items-center justify-between">
+						<div class="card p-4 flex items-center justify-between">
 							<div class="flex gap-2 items-center">
 								<img class="w-5 h-5" alt="imessage" src={imLogo} />
 								<p>imessage</p>
@@ -81,7 +81,7 @@
 							<div><p class="text-gray-500">connected</p></div>
 						</div>
 
-						<div class="card p-4 mt-1 flex items-center justify-between">
+						<div class="card p-4 flex items-center justify-between">
 							<div class="flex gap-2 items-center">
 								<img class="w-5 h-4" alt="gmail" src={gmailLogo} />
 								<p>gmail</p>
@@ -89,7 +89,7 @@
 							<div><p class="text-gray-500">connected</p></div>
 						</div>
 
-						<div class="card p-4 mt-1 flex items-center justify-between">
+						<div class="card p-4 flex items-center justify-between">
 							<div class="flex gap-2 items-center">
 								<img class="w-5 h-5" alt="googlephotos" src={gPhotos} />
 								<p>google photos</p>
@@ -100,7 +100,7 @@
 				{/if}
 
 				{#if ready}
-					<PromptInput bind:input={input}></PromptInput>
+					<PromptInput bind:input></PromptInput>
 				{/if}
 			</div>
 		</div>

@@ -67,7 +67,7 @@ def retrieve_persona_notepad(phone_number: str) -> str:
     print("retrieve_persona_notepad")
     return "Persona {}"
 
-def call_func(response: str):
+async def call_func(response: str, notify_callback = None):
     code_parser = re.compile(r"((?:query).*|(?:save).*|(?:retrieve).*)\(.*\)", re.MULTILINE)
     # if m := parser.match(response.splitlines()[-1]):
     parts = response.split("\n\n")
@@ -78,6 +78,8 @@ def call_func(response: str):
             for line in lines[1:]:
                 if code_match := code_parser.search(line):
                     code = code_match.group(0)
+                    if notify_callback:
+                        await notify_callback(code)
                     # super secure 😎
                     try:
                         results.append(eval(code))
@@ -88,6 +90,38 @@ def call_func(response: str):
             return lines[1:], results
     else:
         return None, False
+
+async def stream(q, notify_callback):
+
+    chat_instance = chat.Chat()
+
+    r = chat_instance.chat(q)
+    while True:
+        if "USER_OUTPUT:" in r:
+            #     print(r)
+            idx_of_response = r.index("USER_OUTPUT:")
+            final_response = r[idx_of_response + len("USER_OUTPUT:") :]
+            if "n/a" not in final_response:
+                print("\n" * 10)
+                print(final_response)
+                return 0, final_response  # exit with success
+                # else:
+                return 1, final_response  # exit with no success
+        code, output = await call_func(r, notify_callback)
+        if output:
+            new_input = ""
+
+            for i in range(len(code)):
+                new_input += f"Output of {code[i]}:\n{output[i]}\n\n"
+
+            # new_input += "The persona notepad should be used for storing fast facts . For example, add birthdays, hobbies, etc. "
+            new_input += f"Please respond with further API_CALLS or USER_OUTPUT (cite sources, provide good reasoning, summarize steps) to answer the query. Be very verbose and friendly in your USER_OUTPUT, providing as much information as possible.: {q}"
+            print(new_input)
+            r = chat_instance.chat(new_input)
+        else:
+            print("am confused", r)
+            break
+    return 2, r  # exit with error
 
 def main(q):
     chat_instance = chat.Chat()
