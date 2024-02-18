@@ -26,6 +26,6 @@
 		<input class="input rounded-lg" bind:value={input} placeholder="ask anything :)" />
 		<button on:click={submit} type="button" class="shrink-0 btn-icon variant-filled-surface"
 			><ArrowRightIcon /></button
-		></a>
+		>
 	</div>
 {/if}
