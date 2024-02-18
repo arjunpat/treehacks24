@@ -46,10 +46,10 @@
 <div class="container h-full mx-auto flex justify-center items-center p-4 w-full">
 	<div class="w-full flex flex-col">
 		<div class="flex gap-1 items-center flex-row">
-			<h1 class="text-4xl">BAIB</h1>
+			<h1 class="text-4xl">B<span class="text-gray-300">AI</span>B</h1>
 		</div>
 
-		<div class="container flex justify-center flex-row w-full items-center gap-2 mt-10">
+		<div class="container flex justify-center flex-row w-full items-center gap-2 mt-10 mb-5">
 			<div class="w-10">
 				{#if ready}
 					<img
@@ -83,8 +83,8 @@
 
 		<div class="w-full p-4 absolute bottom-0 left-0">
 			{#if ready}
-				<div class="w-full mb-5" transition:fade>
-					<h1>Searches through</h1>
+				<div class="w-full mb-5 flex flex-col gap-2" transition:fade>
+					<h1 class="">Searches through</h1>
 					<div class="card p-4 flex items-center justify-between">
 						<div class="flex gap-2 items-center">
 							<img class="w-5 h-5" alt="imessage" src={imLogo} />
