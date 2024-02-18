@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import AnswerSection from '$lib/components/AnswerSection.svelte';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import Source from '$lib/components/Source.svelte';
@@ -7,9 +8,9 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
-	const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
+	// const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
+	const WEBSOCKET_URL = 'ws://localhost:8000';
 
-	let question = "What is Tony's birthday?";
 	let answer: AnswerContent[] = [
 		{
 			type: 'text',
@@ -48,8 +49,6 @@
 		}
 	];
 
-	let input = '';
-
 	let showAnswer = false;
 	// onMount(() => {
 	// 	setTimeout(() => {
@@ -61,8 +60,18 @@
 	let messageProgress: Progress = { done: false, text: '' };
 
 	let socket: WebSocket;
-	onMount(() => {
-		let socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
+	function init() {
+		input = '';
+
+		if ($query.length === 0) {
+			goto('/');
+			return;
+		}
+
+		showAnswer = false;
+		messageProgress = { done: false, text: '' };
+
+		socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
 		socket.onopen = (event) => {
 			socket.send(JSON.stringify({ question: $query }));
 		};
@@ -85,14 +94,23 @@
 				showAnswer = true;
 			}
 		};
+	}
+	onMount(() => {
+		init();
 	});
 
 	onDestroy(() => {
 		socket?.close();
 	});
+
+	let input = '';
+	function submit(event: any) {
+		query.set(event.detail.text);
+		init();
+	}
 </script>
 
-<div class="container h-full w-full mx-auto p-4 flex flex-col gap-4">
+<div class="container h-full w-full mx-auto p-4 flex flex-col gap-4 mb-16">
 	<div class="mb-4 flex gap-1 items-center flex-row">
 		<h1 class="text-4xl"><a href="/">BAIB</a></h1>
 	</div>
@@ -105,9 +123,11 @@
 	<div>
 		<h4 class="h4 mb-2">Sources</h4>
 		<div class="space-y-2">
-			<Source type="message" progress={messageProgress} />
-			<!-- <Source delay={200} type="email" message="Hi this is Tony" />
+			{#key $query}
+				<Source type="message" progress={messageProgress} />
+				<!-- <Source delay={200} type="email" message="Hi this is Tony" />
 			<Source delay={400} type="photo" message="Here are some photos:" /> -->
+			{/key}
 		</div>
 	</div>
 
@@ -118,7 +138,7 @@
 		</div>
 	{/if}
 
-	<!-- <div class="w-full absolute bottom-0 left-0 p-4">
-		<PromptInput bind:input></PromptInput>
-	</div> -->
+	<div class="w-full fixed bottom-0 left-0 p-4">
+		<PromptInput bind:input on:submit={submit}></PromptInput>
+	</div>
 </div>

@@ -39,7 +39,6 @@
 	}
 
 	function submit(event: any) {
-		console.log('submitted with text', event.detail.text);
 		query.set(event.detail.text);
 		goto('/response');
 	}
