@@ -1,12 +1,24 @@
+from contextlib import asynccontextmanager
 from datetime import datetime
+import copy
+import random
 
 from fastapi import FastAPI, WebSocket
+from fastapi_utils.tasks import repeat_every
 from pydantic import BaseModel
 
 # from chattest import main
 from main import main
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Polling for action items...")
+    await poll_action_items()
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
+actions = []
 
 @app.get("/")
 def read_root():
@@ -64,5 +76,15 @@ async def generate(websocket: WebSocket):
 # response with whether there are action items to take
 @app.get("/actions")
 def get_actions():
-    actions = []
-    return {"actions": actions}
+    resp = {"actions": copy.deepcopy(actions)}
+    actions.clear()
+    return resp
+
+@repeat_every(seconds=10)
+def poll_action_items():
+    print("Calling API...")
+    # TODO: call gmail API -> action item function here
+    r = random.randint(1,100)
+    if r % 5 == 0:
+        print("Item recognized!")
+        actions.append(r)
