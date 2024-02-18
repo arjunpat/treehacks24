@@ -119,6 +119,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+
+persona_notepad.json
+
 # Environments
 .env
 .venv
@@ -160,5 +163,9 @@ cython_debug/
 #.idea/
 
 .env
+<<<<<<< Updated upstream
 
 credentials.json
+=======
+.DS_Store
+>>>>>>> Stashed changes
