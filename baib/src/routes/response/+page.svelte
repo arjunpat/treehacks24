@@ -153,7 +153,9 @@
 		showAnswer = false;
 		messageProgress = { done: false, text: '' };
 
+		socket?.close();
 		socket = new WebSocket(`${WEBSOCKET_URL}/generate`);
+
 		socket.onopen = (event) => {
 			socket.send(JSON.stringify({ question: $query }));
 		};
