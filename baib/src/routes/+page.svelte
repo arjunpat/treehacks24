@@ -69,7 +69,7 @@
 				/>
 			{/if}
 
-			<div class="w-full absolute bottom-0 bg-red-50 p-2">
+			<div class="w-full absolute bottom-0 p-5">
 				{#if ready}
 					<div class="w-full mt-24" transition:fade>
 						<h1>Searches through</h1>
