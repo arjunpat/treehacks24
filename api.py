@@ -51,10 +51,10 @@ actions = [
 ]
 
 
-@app.on_event("startup")
-@repeat_every(seconds=10)
-def poll_action_items():
-    email_loop(handle_new_action)
+# @app.on_event("startup")
+# @repeat_every(seconds=10)
+# def poll_action_items():
+#     email_loop(handle_new_action)
 
 
 def handle_new_action(email: Email):
@@ -64,18 +64,25 @@ def handle_new_action(email: Email):
     )
     c = Chat(email=True)
     r = c.chat(email_str)
+    print("r", r)
     if "```json" in r:
         idx = r.index("```json")
         r = r[idx + len("```json") :]
         idx = r.index("```")
         r = r[:idx]
+        print(r)
 
         action_item = json.loads(r)["action_items"]
-        print(action_item)
-        action_item["due_date"] = eval(action_item["due_date"])
+        action_item[0]["due_date"] = eval(action_item[0]["due_date"])
         actions += action_item
+        print(action_item)
         print(actions)
-    print(r)
+    else:
+        action_item = json.loads(r)["action_items"]
+        action_item[0]["due_date"] = eval(action_item[0]["due_date"])
+        actions += action_item
+        print(action_item)
+        print(actions)
 
 
 chat_instance = chat.Chat(True)
