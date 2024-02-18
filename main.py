@@ -189,7 +189,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         return resp
 
 
-def call_func(response: str):
+async def call_func(response: str, notify_callback = None):
     code_parser = re.compile(
         r"((?:query).*|(?:save).*|(?:retrieve).*)\(.*\)", re.MULTILINE
     )
@@ -203,6 +203,8 @@ def call_func(response: str):
             for line in lines[1:]:
                 if code_match := code_parser.search(line):
                     code = code_match.group(0)
+                    if notify_callback:
+                        await notify_callback(code)
                     codelines.append(code)
                     # super secure 😎
                     try:
@@ -227,7 +229,7 @@ Therefore, based on the available information:
 It's important to note that the absence of clear evidence for a second individual could be due to the nature of the messages reviewed or the specific queries used. Further investigation with different queries or additional context might reveal more about Tony Xin's romantic interests. """
 
 
-def main(query=""):
+async def main(query="", notify_callback = None):
     # query = "Who is Tony Xin romantically interested in. List 2 names and reasons why."
     query = "What should I get Tony Xin for his birthday"
     # query = "What is Akash's birthday?"
@@ -257,7 +259,7 @@ def main(query=""):
                 return 0, final_response  # exit with success
                 # else:
                 return 1, final_response  # exit with no success
-        code, output = call_func(r)
+        code, output = await call_func(r, notify_callback)
         if output:
             new_input = ""
 

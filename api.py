@@ -2,7 +2,7 @@ from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 
-from chattest import main, stream
+from main import main
 
 app = FastAPI()
 
@@ -43,7 +43,7 @@ async def generate(websocket: WebSocket):
 
     body = await websocket.receive_json()
     # Start the long-running task and send progress updates
-    result, ans = await stream(body["question"], notify_progress)
+    result, ans = await main(body["question"], notify_progress)
     status = ""
     match result:
         case 0:
