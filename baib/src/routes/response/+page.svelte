@@ -15,6 +15,10 @@
 </script>
 
 <div class="container h-full mx-auto p-4 flex flex-col gap-4">
+	<div class="flex gap-1 items-center flex-row">
+		<h1 class="text-4xl"><a href="/">BAIB</a></h1>
+	</div>
+
 	<div>
 		<div class="font-bold text-xs">HEY BAIB,</div>
 		<div class="text-2xl">{question}</div>
