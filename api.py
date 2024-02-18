@@ -51,6 +51,12 @@ actions = [
 ]
 
 
+@app.on_event("startup")
+@repeat_every(seconds=10)
+def poll_action_items():
+    email_loop(handle_new_action)
+
+
 def handle_new_action(email: Email):
     global actions
     email_str = (
@@ -142,7 +148,7 @@ async def generate(websocket: WebSocket):
 # response with whether there are action items to take
 @app.get("/actions")
 def get_actions():
-    resp = {"action_items": copy.deepcopy(actions)}
+    resp = {"action_items": actions}
     return resp
 
 
@@ -163,8 +169,3 @@ def validate_json(bruh: str):
         return []
     except:
         return []
-
-
-@repeat_every(seconds=10)
-def poll_action_items():
-    email_loop(handle_new_action)
