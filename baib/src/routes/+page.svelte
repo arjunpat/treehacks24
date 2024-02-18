@@ -48,6 +48,8 @@
 		revealText();
 		ready = true;
 		showHideCursor();
+
+
 	});
 </script>
 
