@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade, slide } from 'svelte/transition';
+  import gmailLogo from '../../assets/gmail.png';
 
 	type CompleteTodoType = (id: string) => void;
 	type RemoveTodoType = (id: string) => void;
@@ -42,7 +43,8 @@
 			<div class={`${todo.completed ? 'line-through' : ''} text-sm`}>
 				{todo.text}
 			</div>
-			<div class="text-gray-500 text-xs">
+			<div class="text-gray-500 text-xs flex gap-2 items-center">
+        <img alt="icon" src={gmailLogo} class="h-3"/>
 				{toDateString(todo.deadline)}
 			</div>
 		</div>
