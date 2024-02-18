@@ -73,8 +73,8 @@ class Chat:
 
     def _get_chat(self):
         completion = self.client.chat.completions.create(
-            # model="gpt-3.5-turbo",
-            model="gpt-4-turbo-preview",
+            model="gpt-3.5-turbo",
+            # model="gpt-4-turbo-preview",
             messages=self.history,
             temperature=0,
         )
@@ -101,3 +101,18 @@ class Chat:
 
         self.history.append({"role": "assistant", "content": message})
         return message
+    
+    # unused for now
+    # def generate(self, query: str):
+    #     self.history.append({"role": "user", "content": query})
+    #     stream = self.client.chat.completions.create(
+    #         # model="gpt-3.5-turbo",
+    #         model="gpt-4-turbo-preview",
+    #         messages=self.history,
+    #         temperature=0,
+    #         stream=True
+    #     )
+    #     for event in stream:
+    #         if "content" in event["choices"][0].delta:
+    #             current_response = event["choices"][0].delta.content
+    #             yield "data: " + current_response + "\n\n"
