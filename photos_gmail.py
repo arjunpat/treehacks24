@@ -169,6 +169,7 @@ def decode_content(byte_content):
 
 seen_emails = set()
 emails = get_most_recent_emails()
+print("GETTING EMAILS1")
 seen_emails.update([email.id for email in emails])
 
 
