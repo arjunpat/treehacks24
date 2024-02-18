@@ -134,18 +134,18 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     CONTEXT_LEN = 4
 
     if "code" in query:
-        return """
-1. Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
-2. Tony - Nov 21, 2019, 1:15: sg
-3. Arjun - Nov 21, 2019, 3:49 pm: im here
-4. Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
-5. Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
-6. Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
-7. Arjun - Nov 21, 2019, 3:56 pm: thanks
-8. Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
-9. Tony - Jan 13, 2023, 12:15 am: yea ofc
-10. Tony - Jan 13, 2023, 12:15 am: 4993
-"""
+        code_convo = """(1) Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
+(2) Tony - Nov 21, 2019, 1:15: sg
+(3) Arjun - Nov 21, 2019, 3:49 pm: im here
+(4) Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
+(5) Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
+(6) Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
+(7) Arjun - Nov 21, 2019, 3:56 pm: thanks
+(8) Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
+(9) Tony - Jan 13, 2023, 12:15 am: yea ofc
+(10) Tony - Jan 13, 2023, 12:15 am: 4993"""
+        code_str_list = [(m.split()[0], m.split()[1:], "Arjun" not in m) for m in code_convo.splitlines()]
+        return code_convo, code_str_list
 
     query = query.strip().replace(",", "").split(" ")
     msg_list = messages[phone_number].messages
