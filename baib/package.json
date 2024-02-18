@@ -37,6 +37,8 @@
   "type": "module",
   "dependencies": {
     "@floating-ui/dom": "1.6.3",
-    "highlight.js": "11.9.0"
+    "@types/showdown": "^2.0.6",
+    "highlight.js": "11.9.0",
+    "showdown": "^2.1.0"
   }
 }

@@ -8,6 +8,7 @@
 	import type { AnswerContent, Progress } from '$lib/types';
 	import { onDestroy, onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import showdown from 'showdown';
 
 	const WEBSOCKET_URL = 'wss://l6xbzhkc-8000.usw3.devtunnels.ms';
 	// const WEBSOCKET_URL = 'ws://localhost:8000';
@@ -40,6 +41,7 @@
 		citations = data.citations;
 
 		const citationsSet = new Set();
+		const converter = new showdown.Converter();
 
 		let left = data.answer;
 		while (left.length > 0) {
@@ -55,7 +57,7 @@
 
 			if (start === -1 || end === -1) break;
 
-			const text = left.substring(0, start);
+			let text = left.substring(0, start);
 			const citationNum = parseInt(left.substring(start + 2, end));
 
 			const messages = [];
@@ -72,9 +74,18 @@
 			}
 
 			left = left.substring(end + 2);
+			if (left[0] === '.' || left[0] === ',') {
+				left = left.substring(1);
+			}
 		}
 		if (left.length > 0) {
 			answer.push({ type: 'text', text: left });
+		}
+
+		for (let i = 0; i < answer.length; ++i) {
+			if (answer[i].type === 'text') {
+				answer[i].text = converter.makeHtml(answer[i].text!);
+			}
 		}
 	}
 
@@ -143,6 +154,7 @@
 		// 		});
 		// 		console.log(answer);
 		// 		return;
+
 		input = '';
 
 		if ($query.length === 0) {

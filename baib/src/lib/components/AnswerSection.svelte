@@ -6,7 +6,7 @@
 <div class="space-y-4">
 	{#each answer as a}
 		{#if a.type === 'text'}
-			<p class="text-sm">{a.text}</p>
+			<p class="text-sm">{@html a.text}</p>
 		{:else if a.type === 'message'}
 			<div class="card p-2 text-sm space-y-2 flex flex-col">
 				{#each a.messages as id}
