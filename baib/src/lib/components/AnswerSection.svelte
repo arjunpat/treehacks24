@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { AnswerContent } from '$lib/types';
-
 	export let answer: any[] = [];
 	export let citations: any = {};
 </script>
@@ -8,7 +6,7 @@
 <div class="space-y-4">
 	{#each answer as a}
 		{#if a.type === 'text'}
-			<div class="text-sm">{a.text}</div>
+			<p class="text-sm">{a.text}</p>
 		{:else if a.type === 'message'}
 			<div class="card p-2 text-sm space-y-2 flex flex-col">
 				{#each a.messages as id}

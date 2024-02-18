@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import pickle
 import re
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,7 +13,15 @@ from messages import Message, read_imessages
 
 db_path = os.path.expanduser("~/Downloads/chat.db")
 contacts = get_contacts()
-messages = read_imessages(db_path)
+# messages = read_imessages(db_path)
+
+
+# with open("message_cache.pkl", "wb") as f:
+# pickle.dump(messages, f)
+
+with open("message_cache.pkl", "rb") as f:
+    messages = pickle.load(f)
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 persona_notepad_file = os.path.join(dir_path, "persona_notepad.json")
@@ -56,7 +65,8 @@ def format_datetime(dt):
     Returns:
     str: The formatted datetime string.
     """
-    return dt.strftime("%d %b %Y at %I:%M %p")
+    # return dt.strftime("%d %b %Y at %I:%M %p")
+    return dt.strftime("%d %b %Y")
 
 
 def query_contacts_by_name(name: str):
@@ -134,18 +144,18 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     CONTEXT_LEN = 4
 
     if "code" in query:
-        return """
-1. Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
-2. Tony - Nov 21, 2019, 1:15: sg
-3. Arjun - Nov 21, 2019, 3:49 pm: im here
-4. Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
-5. Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
-6. Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
-7. Arjun - Nov 21, 2019, 3:56 pm: thanks
-8. Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
-9. Tony - Jan 13, 2023, 12:15 am: yea ofc
-10. Tony - Jan 13, 2023, 12:15 am: 4993
-"""
+        code_convo = """(1) Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
+(2) Tony - Nov 21, 2019, 1:15: sg
+(3) Arjun - Nov 21, 2019, 3:49 pm: im here
+(4) Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
+(5) Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
+(6) Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
+(7) Arjun - Nov 21, 2019, 3:56 pm: thanks
+(8) Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
+(9) Tony - Jan 13, 2023, 12:15 am: yea ofc
+(10) Tony - Jan 13, 2023, 12:15 am: 4993"""
+        code_str_list = [(m.split()[0], m.split()[1:], "Arjun" not in m) for m in code_convo.splitlines()]
+        return code_convo, code_str_list
 
     query = query.strip().replace(",", "").split(" ")
     msg_list = messages[phone_number].messages
@@ -164,7 +174,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     msg_str_list: list[tuple[int, Message]] = []
     for idx in indices:
         msg = messages[phone_number].messages[idx]
-        if len(msg.text) > 5 and len(msg.text) < 125:
+        if len(msg.text) > 5 and len(msg.text) < 90:
             date_str = format_datetime(msg.date)
             person = contact_name if msg.sender == phone_number else msg.sender
 
