@@ -1,4 +1,6 @@
+import base64
 import os
+import time
 from datetime import datetime
 from io import BytesIO
 
@@ -8,14 +10,12 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from PIL import Image
-from io import BytesIO
-import requests
-from datetime import datetime
-import base64
-
 
 # Google Photos API scope
-SCOPES = ["https://www.googleapis.com/auth/photoslibrary.readonly", 'https://www.googleapis.com/auth/gmail.readonly']
+SCOPES = [
+    "https://www.googleapis.com/auth/photoslibrary.readonly",
+    "https://www.googleapis.com/auth/gmail.readonly",
+]
 API_VERSION = "v1"
 
 
@@ -87,37 +87,58 @@ def retrieve_photos():
     #     image = Image.open(BytesIO(img_data))
     #     image.show()
 
+
 def get_most_recent_emails():
     creds = authenticate()
-    service = build('gmail', 'v1', credentials=creds)
+    service = build("gmail", "v1", credentials=creds)
 
-    results = service.users().messages().list(userId='me', labelIds=['INBOX'], maxResults=100).execute()
-    messages = results.get('messages', [])
+    results = (
+        service.users()
+        .messages()
+        .list(
+            userId="me", labelIds=["INBOX"], maxResults=10
+        )  # Reduced maxResults for quicker testing
+        .execute()
+    )
+    messages = results.get("messages", [])
+    emails_strings = []  # Initialize an empty string to hold the email details
 
-    for message in messages:
-        msg = service.users().messages().get(userId='me', id=message['id'], format='full').execute()
-        headers = msg['payload']['headers']
-        subject = [i['value'] for i in headers if i['name'] == 'Subject'][0]
-        from_email = [i['value'] for i in headers if i['name'] == 'From'][0]
-        print(f"From: {from_email}")
-        print(f"Subject: {subject}")
+    if not messages:
+        print("No new emails.")
+    else:
+        for message in messages:
+            msg = (
+                service.users()
+                .messages()
+                .get(userId="me", id=message["id"], format="full")
+                .execute()
+            )
+            headers = msg["payload"]["headers"]
+            subject = [i["value"] for i in headers if i["name"] == "Subject"][0]
+            from_email = [i["value"] for i in headers if i["name"] == "From"][0]
+            email_body = "Email Body Not Available in Plain Text"
 
-        # This gets the whole email lowkey can j use snippet tho
-        # if 'parts' in msg['payload']:
-        #     for part in msg['payload']['parts']:
-        #         if part['mimeType'] == 'text/plain':
-        #             data = part['body']['data']
-        #             text = base64.urlsafe_b64decode(data.encode('ASCII')).decode('utf-8')
-        #             print("Email Body:")
-        #             print(text)
-        # else:
-        #     print("Email Body Not Available in Plain Text")
+            if "parts" in msg["payload"]:
+                for part in msg["payload"]["parts"]:
+                    if part["mimeType"] == "text/plain":
+                        data = part["body"]["data"]
+                        email_body = base64.urlsafe_b64decode(
+                            data.encode("ASCII")
+                        ).decode("utf-8")
+
+            # Append the details of each email to the emails_string
+            emails_strings.append(
+                f"From: {from_email}\nSubject: {subject}\n{email_body}\n\n"
+            )
+
+    return emails_strings  # Return the concatenated string of emails
 
 
-        print(f"Snippet: {msg['snippet']}")
-
-        print("\n")
-
+if __name__ == "__main__":
+    while True:
+        print("Checking for new emails...")
+        get_most_recent_emails()
+        time.sleep(10)  # Wait for ten seconds before checking again
 
 
 if __name__ == "__main__":

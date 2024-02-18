@@ -6,7 +6,7 @@ from datetime import datetime
 import chat
 import textsearch
 from contacts import Contact, get_contacts
-from messages import read_imessages
+from messages import Message, read_imessages
 
 db_path = os.path.expanduser("~/Downloads/chat.db")
 contacts = get_contacts()
@@ -16,22 +16,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 persona_notepad_file = os.path.join(dir_path, "persona_notepad.json")
 with open(persona_notepad_file, "r") as f:
     persona_notepad = json.loads(f.read())
-
-audit = ["+16505189339"]
-
-"""
-Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
-Tony - Nov 21, 2019, 1:15: sg
-Arjun - Nov 21, 2019, 3:49 pm: im here
-Tony - Nov 21, 2019, 3:55 pm: shoot sry im not here
-Tony - Nov 21, 2019, 3:55 pm: uhhhhh you can prob just come in a grab it
-Tony - Nov 21, 2019, 3:56 pm: my door code is 9218
-Arjun - Nov 21, 2019, 3:56 pm: thanks
-Arjun - Jan 13, 2023, 12:01 am: u better let me crash at ur place big dog
-Tony - Jan 13, 2023, 12:15 am: yea ofc
-Tony - Jan 13, 2023, 12:15 am: 4993
-"""
-
 
 # What is Tony's door code?
 # What did I do in Hawaii last summer?
@@ -160,7 +144,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 10. Tony - Jan 13, 2023, 12:15 am: 4993
 """
 
-    query = query.strip().split(" ")
+    query = query.strip().replace(",", "").split(" ")
     msg_list = messages[phone_number].messages
     # filter messages with the relevant query
     for i in range(len(msg_list)):
@@ -174,14 +158,16 @@ def query_text_messages_from_contact(phone_number: str, query: str):
     # grab those messages
     # print(indices)
     msg_str = ""
+    msg_str_list: list[tuple[int, Message]] = []
     for idx in indices:
         msg = messages[phone_number].messages[idx]
         date_str = format_datetime(msg.date)
         person = contact_name if msg.sender == phone_number else msg.sender
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
+        msg_str_list.append((idx, msg))
 
-    return msg_str
+    return msg_str, msg_str_list
     if False:
         searcher = textsearch.TextSearcher()
         searcher.load([m.text for m in msg_list], phone_number)
@@ -189,7 +175,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
         return resp
 
 
-async def call_func(response: str, notify_callback = None):
+async def call_func(response: str, notify_callback=None):
     code_parser = re.compile(
         r"((?:query).*|(?:save).*|(?:retrieve).*)\(.*\)", re.MULTILINE
     )
@@ -218,7 +204,41 @@ async def call_func(response: str, notify_callback = None):
         return None, False
 
 
-""" Based on the text messages, it appears Tony Xin has expressed romantic interest in at least one individual named Olivia. This is evidenced by a message where Tony mentions hanging out with Olivia because it is their "2 year" [2414], indicating a significant anniversary that suggests a romantic relationship. Additionally, there's another instance where Tony mentions that Olivia is staying over, which could imply a close personal relationship [2002].
+# Further refined function to handle citations with multiple numbers, replacing them with a standardized format for each number
+# Adjusting the code to correctly handle citations with multiple numbers and ensure that each citation is replaced with a standardized format for each number, separated by spaces, including handling complex citation formats
+
+
+def std_citations(text):
+    # Find all citations in the text
+    citations = re.findall(r"\[([^\]]+)\]", text)
+
+    # This will store the standardized text
+    standardized_text = text
+
+    for citation in citations:
+        # Extract numbers from the current citation
+        citation_numbers = re.findall(r"\d+", citation)
+
+        # Prepare the standardized citation format by including each number
+        standardized_citation = " ".join(
+            f"{{{{{number}}}}}" for number in citation_numbers
+        )
+
+        # Replace the original citation with its standardized format in the text
+        # Using `re.escape` to avoid issues with special characters in `citation`
+        standardized_text = re.sub(
+            r"\[" + re.escape(citation) + r"\]",
+            standardized_citation,
+            standardized_text,
+            count=1,
+        )
+
+    # Extract unique numbers from all citations for reference
+    all_numbers = re.findall(r"\d+", standardized_text)
+    return sorted(set(all_numbers), key=int), standardized_text
+
+
+response_text = """ Based on the text messages, it appears Tony Xin has expressed romantic interest in at least one individual named Olivia. This is evidenced by a message where Tony mentions hanging out with Olivia because it is their "2 year" [2414], indicating a significant anniversary that suggests a romantic relationship. Additionally, there's another instance where Tony mentions that Olivia is staying over, which could imply a close personal relationship [2002].
 
 However, there isn't clear evidence in the provided messages to confidently identify a second individual Tony Xin might be romantically interested in. The messages mostly revolve around plans with friends, casual conversations, and logistical coordination. While Tony uses affectionate language like "Ok papa" [1650] and "Ok beautiful" [1128], these instances seem more indicative of a playful or affectionate tone rather than clear expressions of romantic interest towards specific individuals other than Olivia.
 
@@ -228,8 +248,13 @@ Therefore, based on the available information:
 
 It's important to note that the absence of clear evidence for a second individual could be due to the nature of the messages reviewed or the specific queries used. Further investigation with different queries or additional context might reveal more about Tony Xin's romantic interests. """
 
+# Apply the refined function to the original response text
+# numbers_v4, standardized_response_v4 = std_citations(response_text)
 
-async def main(query="", notify_callback = None):
+# print(numbers_v4, standardized_response_v4)
+
+
+async def main(query="", notify_callback=None):
     # query = "Who is Tony Xin romantically interested in. List 2 names and reasons why."
     query = "What should I get Tony Xin for his birthday"
     # query = "What is Akash's birthday?"
@@ -247,6 +272,7 @@ async def main(query="", notify_callback = None):
     chat_instance = chat.Chat()
 
     r = chat_instance.chat(query)
+    text_msgs_citations = []
     while True:
         print(r)
         if "USER_OUTPUT:" in r:
@@ -254,9 +280,23 @@ async def main(query="", notify_callback = None):
             idx_of_response = r.index("USER_OUTPUT:")
             final_response = r[idx_of_response + len("USER_OUTPUT:") :]
             if "n/a" not in final_response:
+                cits, ff_reponse = std_citations(final_response)
                 print("\n" * 10)
-                print(final_response)
-                return 0, final_response  # exit with success
+                print(ff_reponse)
+
+                get_cits = set()
+                for num_str in cits:
+                    c = int(num_str)
+                    get_cits.update((c - 1, c, c + 1))
+
+                final_cits = []
+                for c, m in text_msgs_citations:
+                    if c in get_cits:
+                        final_cits.append((c, m))
+
+                print(final_cits)
+
+                return 0, ff_reponse  # exit with success
                 # else:
                 return 1, final_response  # exit with no success
         code, output = await call_func(r, notify_callback)
@@ -264,7 +304,11 @@ async def main(query="", notify_callback = None):
             new_input = ""
 
             for i in range(len(code)):
-                new_input += f"Output of {code[i]}:\n{output[i]}\n\n"
+                if isinstance(output[i], tuple):
+                    text_msgs_citations += output[i][1]
+                    new_input += f"Output of {code[i]}:\n{output[i][0]}\n\n"
+                else:
+                    new_input += f"Output of {code[i]}:\n{output[i]}\n\n"
 
             # new_input += "The persona notepad should be used for storing fast facts . For example, add birthdays, hobbies, etc. "
             new_input += f"Please respond with further API_CALLS or USER_OUTPUT (cite sources, provide good reasoning, summarize steps) to answer the query. Be very verbose and friendly in your USER_OUTPUT, providing as much information as possible.: {query}"

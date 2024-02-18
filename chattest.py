@@ -2,6 +2,7 @@ import re
 from typing import Any
 import chat
 import textsearch
+import asyncio
 
 # fake modeled class aaa
 class Contact:
@@ -91,7 +92,7 @@ async def call_func(response: str, notify_callback = None):
     else:
         return None, False
 
-async def stream(q, notify_callback):
+async def main(q, notify_callback = None):
 
     chat_instance = chat.Chat()
 
@@ -123,25 +124,6 @@ async def stream(q, notify_callback):
             break
     return 2, r  # exit with error
 
-def main(q):
-    chat_instance = chat.Chat()
-    r = chat_instance.chat(q)
-
-    while True:
-        if "USER_OUTPUT:" in r:
-            print(r)
-            return 0, r
-        code, output = call_func(r)
-        if output:
-            print(r)
-            print(output)
-            r = chat_instance.chat(
-                f"Here is the output of calling the following api function {code}:\n\n\n\n{output}"
-            )
-        else:
-            print("am confused", r)
-            break
-    return 2, r
-
 if __name__ == "__main__":
-    main("When is Clement's birthday?")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main("When is Clement's birthday?"))
