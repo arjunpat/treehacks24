@@ -42,7 +42,7 @@
 	});
 </script>
 
-<div class="container h-full mx-auto flex justify-center items-center p-5 w-full">
+<div class="container h-full mx-auto flex justify-center items-center p-4 w-full">
 	<div class="w-full">
 		<div class="flex gap-1 items-center flex-row">
 			<h1 class="text-4xl">BAIB</h1>

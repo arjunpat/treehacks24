@@ -167,7 +167,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 
         msg_str += f"({idx}) {person} - {date_str}: {msg.text}\n"
 
-    # return msg_str
+    return msg_str
     if False:
         return """
 1. Arjun - Nov 21, 2019 12:49 pm: yo gonna grab my bag around 4 if that's cool
@@ -183,7 +183,7 @@ def query_text_messages_from_contact(phone_number: str, query: str):
 """
     else:
         searcher = textsearch.TextSearcher()
-        searcher.load(messages[phone_number].messages, phone_number)
+        searcher.load([m.text for m in msg_list], phone_number)
         resp = searcher.search(query)
         return resp
 
@@ -216,7 +216,9 @@ def call_func(response: str):
 
 
 def main(query=""):
-    query = "When is Tony's door code?"
+    # query = "Who is Tony Xin romantically interested in. List 2 names and reasons why."
+    query = "What should I get Tony Xin for his birthday"
+    # query = "What is Akash's birthday?"
     if query.strip() == "":
         return ""
     # result = query_contacts_by_name("Tony")
@@ -241,8 +243,8 @@ def main(query=""):
                 print("\n" * 10)
                 print(final_response)
                 return 0, final_response  # exit with success
-            # else:
-            #     return 1, final_response  # exit with no success
+                # else:
+                return 1, final_response  # exit with no success
         code, output = call_func(r)
         if output:
             new_input = ""
